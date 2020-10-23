@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Data processing &#8212; MTUQ Documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Library reference" href="../library/index.html" />
+    <link rel="prev" title="Acquiring Green’s functions" href="03.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          MTUQ</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick_start.html">Quick start</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="01.html">Learning ObsPy and MTUQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02.html">Acquiring seismic data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03.html">Acquiring Green’s functions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/index.html">Library reference</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Data processing</a><ul>
+<li><a class="reference internal" href="#an-approach-based-on-mtuq-processdata">An approach based on <cite>mtuq.ProcessData</cite></a></li>
+<li><a class="reference internal" href="#time-discretization-requirements">Time discretization requirements</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="03.html" title="Previous Chapter: Acquiring Green’s functions"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Acquiring Gre...</span>
+    </a>
+  </li>
+  <li>
+    <a href="../library/index.html" title="Next Chapter: Library reference"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Library reference &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="section" id="data-processing">
+<h1>Data processing<a class="headerlink" href="#data-processing" title="Permalink to this headline">¶</a></h1>
+<p>Filtering, windowing and other signal processing operations are essential for meaningful comparisons between data synthetics.</p>
+<p>To make data processing easier, <cite>mtuq.ProcessData</cite> is an attempt at a one-size-fits-all data processing class.  While the approach below based on <cite>mtuq.ProcessData</cite> is fairly general,  users are neverthelsss free to apply their own custom data processing functions instead, with the only requirement being that the <a class="reference external" href="https://uafgeotools.github.io/mtuq/user_guide/04.html#time-discretization-requirements">time discretization</a> conditions below end up being satisfied.</p>
+<div class="section" id="an-approach-based-on-mtuq-processdata">
+<h2>An approach based on <cite>mtuq.ProcessData</cite><a class="headerlink" href="#an-approach-based-on-mtuq-processdata" title="Permalink to this headline">¶</a></h2>
+<p>Data processing choices include filter type, window length, and many others. For detailed descriptions of all available parameters, see the <a class="reference external" href="https://uafgeotools.github.io/mtuq/library/generated/mtuq.ProcessData.html">API reference</a>.</p>
+<p>With <cite>mtuq.ProcessData</cite>, the choice of data processing parameters is clearly separated from the actual application of the data processing function to the seismic data, resulting in a two-step procedure.</p>
+<p>In the first step, the user supplies parameters to create a data processing function:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">process_data</span> <span class="o">=</span> <span class="n">ProcessData</span><span class="p">(</span><span class="o">**</span><span class="n">parameters</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In the second step, an ObsPy stream is given as input and a processed stream returned as output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">processed_stream</span> <span class="o">=</span> <span class="n">process_data</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Data processing can also be applied to an entire <cite>Dataset</cite> at once:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">processed_data</span> <span class="o">=</span> <span class="n">mtuq</span><span class="o">.</span><span class="n">Dataset</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">stream</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
+    <span class="n">processed_stream</span> <span class="o">=</span> <span class="n">process_data</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+    <span class="n">processed_data</span> <span class="o">+=</span> <span class="n">processed_stream</span>
+</pre></div>
+</div>
+<p>Or, more succinctly:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">processed_dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">process_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="time-discretization-requirements">
+<h2>Time discretization requirements<a class="headerlink" href="#time-discretization-requirements" title="Permalink to this headline">¶</a></h2>
+<p>To make meaningful comparisons betweeen data and synthetics, windows must of course be chosen to include body wave and/or surface wave phases of interest.</p>
+<p>Two additional conditions turn out to be useful for numerical efficiency and software engineering robustness:</p>
+<ol class="arabic simple">
+<li><p>all traces must have the same sampling rate and number of samples</p></li>
+<li><p>all traces common to the same station must have the same startime and endtime</p></li>
+</ol>
+<p>By imposing these time discretization requirements, MTUQ achieves faster memory access patterns, more efficent misfit evaluation, and more easily maintainable code.</p>
+<p>An easy way to ensure that the above requirements are satisfied is to simply use <cite>mtuq.ProcessData</cite> for data processing.</p>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

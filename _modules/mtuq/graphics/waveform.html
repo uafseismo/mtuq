@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mtuq.graphics.waveform &#8212; MTUQ Documentation</title>
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/style.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          MTUQ</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install/index.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quick_start.html">Quick start</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/01.html">Learning ObsPy and MTUQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/02.html">Acquiring seismic data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/03.html">Acquiring Green’s functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/04.html">Data processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../library/index.html">Library reference</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for mtuq.graphics.waveform</h1><div class="highlight"><pre>
+<span></span>
+<span class="c1">#</span>
+<span class="c1"># graphics/waveform.py - plots of observed and synthetic waveforms</span>
+<span class="c1">#</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">pyplot</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">matplotlib.font_manager</span> <span class="kn">import</span> <span class="n">FontProperties</span>
+<span class="kn">from</span> <span class="nn">mtuq.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">mtuq.event</span> <span class="kn">import</span> <span class="n">MomentTensor</span><span class="p">,</span> <span class="n">Force</span>
+<span class="kn">from</span> <span class="nn">mtuq.graphics.header</span> <span class="kn">import</span> <span class="n">MomentTensorHeader</span><span class="p">,</span> <span class="n">ForceHeader</span>
+<span class="kn">from</span> <span class="nn">mtuq.util</span> <span class="kn">import</span> <span class="n">warn</span>
+<span class="kn">from</span> <span class="nn">mtuq.util.signal</span> <span class="kn">import</span> <span class="n">get_components</span>
+<span class="kn">from</span> <span class="nn">obspy</span> <span class="kn">import</span> <span class="n">Stream</span><span class="p">,</span> <span class="n">Trace</span>
+<span class="kn">from</span> <span class="nn">obspy.geodetics</span> <span class="kn">import</span> <span class="n">gps2dist_azimuth</span>
+
+
+
+<span class="c1">#</span>
+<span class="c1"># functions that generate entire figures</span>
+<span class="c1">#</span>
+
+<div class="viewcode-block" id="plot_data_synthetics"><a class="viewcode-back" href="../../../library/generated/mtuq.graphics.plot_data_synthetics.html#mtuq.graphics.plot_data_synthetics">[docs]</a><span class="k">def</span> <span class="nf">plot_data_synthetics</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> 
+        <span class="n">data_bw</span><span class="p">,</span>
+        <span class="n">data_sw</span><span class="p">,</span>
+        <span class="n">synthetics_bw</span><span class="p">,</span>
+        <span class="n">synthetics_sw</span><span class="p">,</span>
+        <span class="n">stations</span><span class="p">,</span>
+        <span class="n">origin</span><span class="p">,</span>
+        <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">total_misfit_bw</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> 
+        <span class="n">total_misfit_sw</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> 
+        <span class="n">normalize</span><span class="o">=</span><span class="s1">&#39;maximum_amplitude&#39;</span><span class="p">,</span>
+        <span class="n">station_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+        <span class="n">trace_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot; Creates CAP-style data/synthetics figure</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># body wave datasets can be empty</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">data_bw</span><span class="p">:</span>
+        <span class="n">data_bw</span> <span class="o">=</span> <span class="n">_empty_dataset</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">synthetics_bw</span><span class="p">:</span>
+        <span class="n">synthetics_bw</span> <span class="o">=</span> <span class="n">_empty_dataset</span><span class="p">()</span>
+
+    <span class="c1"># surface wave datasets must be nonempty</span>
+    <span class="k">if</span> <span class="n">_isempty</span><span class="p">(</span><span class="n">data_sw</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Empty dataset&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">_isempty</span><span class="p">(</span><span class="n">synthetics_sw</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Empty dataset&#39;</span><span class="p">)</span>
+
+    <span class="c1"># how many stations have at least one trace?</span>
+    <span class="n">nstations</span> <span class="o">=</span> <span class="n">_count</span><span class="p">([</span><span class="n">data_bw</span><span class="p">,</span> <span class="n">data_sw</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">nstations</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Not enough stations&#39;</span><span class="p">)</span>
+
+    <span class="c1"># dimensions of subplot array</span>
+    <span class="n">nrows</span> <span class="o">=</span> <span class="n">nstations</span>
+    <span class="n">ncolumns</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">_irow</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># column 0 - station labels</span>
+    <span class="c1"># columns 1,2 - body wave traces</span>
+    <span class="c1"># columns 3,4,5 - surface wave traces</span>
+    <span class="n">column_width_ratios</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.125</span><span class="p">,</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">]</span>
+
+    <span class="c1"># figure dimensions in inches</span>
+    <span class="n">height</span> <span class="o">=</span> <span class="mf">1.333</span><span class="o">*</span><span class="n">nrows</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="mf">12.</span>
+    <span class="n">margin_bottom</span> <span class="o">=</span> <span class="mf">0.25</span>
+    <span class="n">margin_top</span> <span class="o">=</span> <span class="mf">0.25</span>
+    <span class="n">margin_left</span> <span class="o">=</span> <span class="mf">0.25</span>
+    <span class="n">margin_right</span> <span class="o">=</span> <span class="mf">0.25</span>
+
+    <span class="k">if</span> <span class="n">header</span><span class="p">:</span>
+        <span class="n">header_height</span> <span class="o">=</span> <span class="mf">1.75</span>
+        <span class="n">header_width</span> <span class="o">=</span> <span class="n">width</span>
+        <span class="n">header_margin_top</span> <span class="o">=</span> <span class="n">margin_top</span>
+        <span class="n">header_margin_left</span> <span class="o">=</span> <span class="n">margin_left</span>
+        <span class="n">height</span> <span class="o">+=</span> <span class="n">header_height</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">header_height</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">header_width</span> <span class="o">=</span> <span class="mf">0.</span>
+
+    <span class="k">if</span> <span class="n">station_labels</span><span class="p">:</span>
+        <span class="n">margin_left</span> <span class="o">+=</span> <span class="mf">0.5</span>
+
+    <span class="n">height</span> <span class="o">+=</span> <span class="n">margin_bottom</span>
+    <span class="n">height</span> <span class="o">+=</span> <span class="n">margin_top</span>
+    <span class="n">width</span> <span class="o">+=</span> <span class="n">margin_left</span>
+    <span class="n">width</span> <span class="o">+=</span> <span class="n">margin_right</span>
+
+    <span class="c1"># adjust dimensions if body waves absent</span>
+    <span class="k">if</span> <span class="n">_isempty</span><span class="p">(</span><span class="n">data_bw</span><span class="p">):</span>
+        <span class="n">width</span> <span class="o">-=</span> <span class="mf">2.5</span>
+        <span class="n">column_width_ratios</span><span class="o">=</span><span class="p">[</span><span class="mf">0.125</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">]</span>
+    
+
+    <span class="c1"># initialize figure</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">pyplot</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="p">,</span> <span class="n">ncolumns</span><span class="p">,</span> 
+        <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">),</span>
+        <span class="n">subplot_kw</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">clip_on</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">gridspec_kw</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">width_ratios</span><span class="o">=</span><span class="n">column_width_ratios</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="n">pyplot</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span>
+        <span class="n">left</span><span class="o">=</span><span class="n">margin_left</span><span class="o">/</span><span class="n">width</span><span class="p">,</span>
+        <span class="n">right</span><span class="o">=</span><span class="mf">1.</span><span class="o">-</span><span class="n">margin_right</span><span class="o">/</span><span class="n">width</span><span class="p">,</span>
+        <span class="n">bottom</span><span class="o">=</span><span class="n">margin_bottom</span><span class="o">/</span><span class="n">height</span><span class="p">,</span>
+        <span class="n">top</span><span class="o">=</span><span class="mf">1.</span><span class="o">-</span><span class="p">(</span><span class="n">header_height</span><span class="o">+</span><span class="n">margin_top</span><span class="p">)</span><span class="o">/</span><span class="n">height</span><span class="p">,</span>
+        <span class="n">wspace</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+        <span class="n">hspace</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">_hide_axes</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span>
+
+
+    <span class="c1"># add labels above each column</span>
+    <span class="n">add_component_labels</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span>
+        <span class="n">body_wave_labels</span><span class="o">=</span><span class="p">(</span><span class="ow">not</span> <span class="n">_isempty</span><span class="p">(</span><span class="n">data_bw</span><span class="p">)),</span>
+        <span class="n">surface_wave_labels</span><span class="o">=</span><span class="p">(</span><span class="ow">not</span> <span class="n">_isempty</span><span class="p">(</span><span class="n">data_sw</span><span class="p">)),</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">header</span><span class="p">:</span>
+        <span class="c1"># write CAPUAF-style header</span>
+        <span class="n">header</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">header_height</span><span class="p">,</span> <span class="n">header_width</span><span class="p">,</span>
+            <span class="n">header_margin_left</span><span class="p">,</span> <span class="n">header_margin_top</span><span class="p">)</span>
+
+    <span class="c1"># determine maximum trace amplitudes</span>
+    <span class="n">max_amplitude_bw</span> <span class="o">=</span> <span class="n">_max</span><span class="p">(</span><span class="n">data_bw</span><span class="p">,</span> <span class="n">synthetics_bw</span><span class="p">)</span>
+    <span class="n">max_amplitude_sw</span> <span class="o">=</span> <span class="n">_max</span><span class="p">(</span><span class="n">data_sw</span><span class="p">,</span> <span class="n">synthetics_sw</span><span class="p">)</span>
+
+
+    <span class="c1">#</span>
+    <span class="c1"># loop over stations</span>
+    <span class="c1">#</span>
+
+    <span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stations</span><span class="p">)):</span>
+
+        <span class="c1"># skip empty stations</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_bw</span><span class="p">[</span><span class="n">_i</span><span class="p">])</span><span class="o">==</span><span class="nb">len</span><span class="p">(</span><span class="n">data_sw</span><span class="p">[</span><span class="n">_i</span><span class="p">])</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># add station labels</span>
+        <span class="k">if</span> <span class="n">station_labels</span><span class="p">:</span>
+            <span class="n">add_station_labels</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="n">_irow</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">stations</span><span class="p">[</span><span class="n">_i</span><span class="p">],</span> <span class="n">origin</span><span class="p">)</span>
+
+
+        <span class="c1">#</span>
+        <span class="c1"># plot body wave traces</span>
+        <span class="c1">#</span>
+
+        <span class="n">stream_dat</span> <span class="o">=</span> <span class="n">data_bw</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span>
+        <span class="n">stream_syn</span> <span class="o">=</span> <span class="n">synthetics_bw</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">dat</span> <span class="ow">in</span> <span class="n">stream_dat</span><span class="p">:</span>
+            <span class="n">component</span> <span class="o">=</span> <span class="n">dat</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">channel</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+            <span class="n">weight</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="s1">&#39;weight&#39;</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">weight</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># skip missing components</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">syn</span> <span class="o">=</span> <span class="n">stream_syn</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="n">component</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Missing component, skipping...&#39;</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># plot traces</span>
+            <span class="k">if</span> <span class="n">component</span><span class="o">==</span><span class="s1">&#39;Z&#39;</span><span class="p">:</span>
+                <span class="n">axis</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">_irow</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">component</span><span class="o">==</span><span class="s1">&#39;R&#39;</span><span class="p">:</span>
+                <span class="n">axis</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">_irow</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">plot</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">syn</span><span class="p">)</span>
+
+            <span class="c1"># normalize amplitudes</span>
+            <span class="k">if</span> <span class="n">normalize</span><span class="o">==</span><span class="s1">&#39;trace_amplitude&#39;</span><span class="p">:</span>
+                <span class="n">max_trace</span> <span class="o">=</span> <span class="n">_max</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">syn</span><span class="p">)</span>
+                <span class="n">ylim</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="o">*</span><span class="n">max_trace</span><span class="p">,</span> <span class="o">+</span><span class="mi">3</span><span class="o">*</span><span class="n">max_trace</span><span class="p">]</span>
+                <span class="n">axis</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">*</span><span class="n">ylim</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">normalize</span><span class="o">==</span><span class="s1">&#39;station_amplitude&#39;</span><span class="p">:</span>
+                <span class="n">max_stream</span> <span class="o">=</span> <span class="n">_max</span><span class="p">(</span><span class="n">stream_dat</span><span class="p">,</span> <span class="n">stream_syn</span><span class="p">)</span>
+                <span class="n">ylim</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="o">*</span><span class="n">max_stream</span><span class="p">,</span> <span class="o">+</span><span class="mi">3</span><span class="o">*</span><span class="n">max_stream</span><span class="p">]</span>
+                <span class="n">axis</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">*</span><span class="n">ylim</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">normalize</span><span class="o">==</span><span class="s1">&#39;maximum_amplitude&#39;</span><span class="p">:</span>
+                <span class="n">ylim</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">max_amplitude_bw</span><span class="p">,</span> <span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">max_amplitude_bw</span><span class="p">]</span>
+                <span class="n">axis</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">*</span><span class="n">ylim</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">trace_labels</span><span class="p">:</span>
+                <span class="n">add_trace_labels</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">syn</span><span class="p">,</span> <span class="n">total_misfit_bw</span><span class="p">)</span>
+
+
+        <span class="c1">#</span>
+        <span class="c1"># plot surface wave traces</span>
+        <span class="c1">#</span>
+
+        <span class="n">stream_dat</span> <span class="o">=</span> <span class="n">data_sw</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span>
+        <span class="n">stream_syn</span> <span class="o">=</span> <span class="n">synthetics_sw</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">dat</span> <span class="ow">in</span> <span class="n">stream_dat</span><span class="p">:</span>
+            <span class="n">component</span> <span class="o">=</span> <span class="n">dat</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">channel</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+            <span class="n">weight</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="s1">&#39;weight&#39;</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">weight</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># skip missing components</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">syn</span> <span class="o">=</span> <span class="n">stream_syn</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="n">component</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Missing component, skipping...&#39;</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># plot traces</span>
+            <span class="k">if</span> <span class="n">component</span><span class="o">==</span><span class="s1">&#39;Z&#39;</span><span class="p">:</span>
+                <span class="n">axis</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">_irow</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">component</span><span class="o">==</span><span class="s1">&#39;R&#39;</span><span class="p">:</span>
+                <span class="n">axis</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">_irow</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">component</span><span class="o">==</span><span class="s1">&#39;T&#39;</span><span class="p">:</span>
+                <span class="n">axis</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">_irow</span><span class="p">][</span><span class="mi">5</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">plot</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">syn</span><span class="p">)</span>
+
+            <span class="c1"># normalize amplitude</span>
+            <span class="k">if</span> <span class="n">normalize</span><span class="o">==</span><span class="s1">&#39;trace_amplitude&#39;</span><span class="p">:</span>
+                <span class="n">max_trace</span> <span class="o">=</span> <span class="n">_max</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">syn</span><span class="p">)</span>
+                <span class="n">ylim</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.5</span><span class="o">*</span><span class="n">max_trace</span><span class="p">,</span> <span class="o">+</span><span class="mf">1.5</span><span class="o">*</span><span class="n">max_trace</span><span class="p">]</span>
+                <span class="n">axis</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">*</span><span class="n">ylim</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">normalize</span><span class="o">==</span><span class="s1">&#39;station_amplitude&#39;</span><span class="p">:</span>
+                <span class="n">max_stream</span> <span class="o">=</span> <span class="n">_max</span><span class="p">(</span><span class="n">stream_dat</span><span class="p">,</span> <span class="n">stream_syn</span><span class="p">)</span>
+                <span class="n">ylim</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.5</span><span class="o">*</span><span class="n">max_stream</span><span class="p">,</span> <span class="o">+</span><span class="mf">1.5</span><span class="o">*</span><span class="n">max_stream</span><span class="p">]</span>
+                <span class="n">axis</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">*</span><span class="n">ylim</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">normalize</span><span class="o">==</span><span class="s1">&#39;maximum_amplitude&#39;</span><span class="p">:</span>
+                <span class="n">ylim</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">max_amplitude_sw</span><span class="p">,</span> <span class="o">+</span><span class="n">max_amplitude_sw</span><span class="p">]</span>
+                <span class="n">axis</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">*</span><span class="n">ylim</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">trace_labels</span><span class="p">:</span>
+                <span class="n">add_trace_labels</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">syn</span><span class="p">,</span> <span class="n">total_misfit_sw</span><span class="p">)</span>
+
+        <span class="n">_irow</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">pyplot</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">pyplot</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<span class="k">def</span> <span class="nf">plot_data_greens</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> 
+        <span class="n">data_bw</span><span class="p">,</span>
+        <span class="n">data_sw</span><span class="p">,</span>
+        <span class="n">greens_bw</span><span class="p">,</span>
+        <span class="n">greens_sw</span><span class="p">,</span>
+        <span class="n">process_bw</span><span class="p">,</span>
+        <span class="n">process_sw</span><span class="p">,</span>
+        <span class="n">misfit_bw</span><span class="p">,</span>
+        <span class="n">misfit_sw</span><span class="p">,</span>
+        <span class="n">stations</span><span class="p">,</span>
+        <span class="n">origin</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">,</span>
+        <span class="n">source_dict</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot; Creates CAP-style data/synthetics figure</span>
+
+<span class="sd">    Similar to plot_data_synthetics, except provides different input argument</span>
+<span class="sd">    syntax</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">_isempty</span><span class="p">(</span><span class="n">data_bw</span><span class="p">):</span>
+        <span class="c1"># will prevent body wave data processing from appearing in figure header</span>
+        <span class="n">process_bw</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">_isempty</span><span class="p">(</span><span class="n">data_sw</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Empty dataset&#39;</span><span class="p">)</span>
+
+    <span class="c1">#</span>
+    <span class="c1"># generate synthetics</span>
+    <span class="c1">#</span>
+    <span class="n">greens_bw</span> <span class="o">=</span> <span class="n">greens_bw</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">origin</span><span class="p">)</span>
+    <span class="n">greens_sw</span> <span class="o">=</span> <span class="n">greens_sw</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">origin</span><span class="p">)</span>
+    <span class="n">_set_components</span><span class="p">(</span><span class="n">data_bw</span><span class="p">,</span> <span class="n">greens_bw</span><span class="p">)</span>
+    <span class="n">_set_components</span><span class="p">(</span><span class="n">data_sw</span><span class="p">,</span> <span class="n">greens_sw</span><span class="p">)</span>
+
+    <span class="n">synthetics_bw</span> <span class="o">=</span> <span class="n">greens_bw</span><span class="o">.</span><span class="n">get_synthetics</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">synthetics_sw</span> <span class="o">=</span> <span class="n">greens_sw</span><span class="o">.</span><span class="n">get_synthetics</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+        <span class="c1"># supress warnings for empty body wave dataset</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+
+        <span class="c1"># besides calculating misfit, these commands set the trace attributes</span>
+        <span class="c1"># used to align data and synthetics in the waveform plots</span>
+        <span class="n">total_misfit_bw</span> <span class="o">=</span> <span class="n">misfit_bw</span><span class="p">(</span><span class="n">data_bw</span><span class="p">,</span> <span class="n">greens_bw</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">set_attributes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">total_misfit_sw</span> <span class="o">=</span> <span class="n">misfit_sw</span><span class="p">(</span><span class="n">data_sw</span><span class="p">,</span> <span class="n">greens_sw</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">set_attributes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+    <span class="c1">#</span>
+    <span class="c1"># prepare figure header</span>
+    <span class="c1">#</span>
+    <span class="k">try</span><span class="p">:</span>
+       <span class="n">event_name</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">event_name</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">_get_tag</span><span class="p">(</span><span class="n">greens_sw</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tags</span><span class="p">,</span> <span class="s1">&#39;model&#39;</span><span class="p">)</span>
+    <span class="n">solver</span> <span class="o">=</span> <span class="n">_get_tag</span><span class="p">(</span><span class="n">greens_sw</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tags</span><span class="p">,</span> <span class="s1">&#39;solver&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s1">&#39;header&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;header&#39;</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">source</span><span class="p">)</span><span class="o">==</span><span class="n">MomentTensor</span><span class="p">:</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="n">MomentTensorHeader</span><span class="p">(</span><span class="n">event_name</span><span class="p">,</span>
+            <span class="n">process_bw</span><span class="p">,</span> <span class="n">process_sw</span><span class="p">,</span> <span class="n">misfit_bw</span><span class="p">,</span> <span class="n">misfit_bw</span><span class="p">,</span>
+            <span class="n">model</span><span class="p">,</span> <span class="n">solver</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">source_dict</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span>
+            <span class="n">total_misfit_bw</span><span class="p">,</span> <span class="n">total_misfit_sw</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">source</span><span class="p">)</span><span class="o">==</span><span class="n">Force</span><span class="p">:</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="n">ForceHeader</span><span class="p">(</span><span class="n">event_name</span><span class="p">,</span>
+            <span class="n">process_bw</span><span class="p">,</span> <span class="n">process_sw</span><span class="p">,</span> <span class="n">misfit_bw</span><span class="p">,</span> <span class="n">misfit_bw</span><span class="p">,</span>
+            <span class="n">model</span><span class="p">,</span> <span class="n">solver</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">source_dict</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span>
+            <span class="n">total_misfit_bw</span><span class="p">,</span> <span class="n">total_misfit_sw</span><span class="p">)</span>
+
+    <span class="n">plot_data_synthetics</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span>
+        <span class="n">data_bw</span><span class="p">,</span> <span class="n">data_sw</span><span class="p">,</span> <span class="n">synthetics_bw</span><span class="p">,</span> <span class="n">synthetics_sw</span><span class="p">,</span> <span class="n">stations</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span>
+        <span class="n">total_misfit_bw</span><span class="o">=</span><span class="n">total_misfit_bw</span><span class="p">,</span> <span class="n">total_misfit_sw</span><span class="o">=</span><span class="n">total_misfit_sw</span><span class="p">,</span>
+        <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">plot_time_shifts</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">stations</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+
+<span class="k">def</span> <span class="nf">compute_time_shifts</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">greens</span><span class="p">,</span> <span class="n">misfit</span><span class="p">,</span> <span class="n">stations</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+
+
+
+<span class="c1">#</span>
+<span class="c1"># functions that act on individual axes</span>
+<span class="c1">#</span>
+
+<span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">syn</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Plots data and synthetics time series on current axes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">t1</span><span class="p">,</span><span class="n">t2</span><span class="p">,</span><span class="n">nt</span><span class="p">,</span><span class="n">dt</span> <span class="o">=</span> <span class="n">_time_stats</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+
+    <span class="n">start</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">syn</span><span class="p">,</span> <span class="s1">&#39;start&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">stop</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">syn</span><span class="p">,</span> <span class="s1">&#39;stop&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">syn</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">t2</span><span class="o">-</span><span class="n">t1</span><span class="p">,</span><span class="n">nt</span><span class="p">,</span><span class="n">dt</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">dat</span><span class="o">.</span><span class="n">data</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">syn</span><span class="o">.</span><span class="n">data</span>
+
+    <span class="c1"># ``clip_on=False`` and ``zorder=10`` should prevent the plotted data from</span>
+    <span class="c1"># getting &quot;clipped&quot;, but this doesn&#39;t seem to be happening</span>
+    <span class="n">axis</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+        <span class="n">clip_on</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">axis</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.25</span><span class="p">,</span> 
+        <span class="n">clip_on</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">add_component_labels</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">body_wave_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">surface_wave_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Displays component name above each column</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">font</span> <span class="o">=</span> <span class="n">FontProperties</span><span class="p">()</span>
+    <span class="n">font</span><span class="o">.</span><span class="n">set_weight</span><span class="p">(</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">body_wave_labels</span><span class="p">:</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">pyplot</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.70</span><span class="p">,</span> <span class="s1">&#39;Z&#39;</span><span class="p">,</span> <span class="n">fontproperties</span><span class="o">=</span><span class="n">font</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> 
+            <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">)</span>
+
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">pyplot</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.70</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="n">fontproperties</span><span class="o">=</span><span class="n">font</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> 
+            <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">surface_wave_labels</span><span class="p">:</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">pyplot</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.70</span><span class="p">,</span> <span class="s1">&#39;Z&#39;</span><span class="p">,</span> <span class="n">fontproperties</span><span class="o">=</span><span class="n">font</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+            <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">)</span>
+
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span>
+        <span class="n">pyplot</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.70</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="n">fontproperties</span><span class="o">=</span><span class="n">font</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+            <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">)</span>
+
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">5</span><span class="p">]</span>
+        <span class="n">pyplot</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.70</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="n">fontproperties</span><span class="o">=</span><span class="n">font</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+            <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">add_station_labels</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">station</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Displays station id, distance, and azimuth to the left of current axes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">distance_in_m</span><span class="p">,</span> <span class="n">azimuth</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">gps2dist_azimuth</span><span class="p">(</span>
+        <span class="n">origin</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span>
+        <span class="n">origin</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span>
+        <span class="n">station</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span>
+        <span class="n">station</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span>
+
+    <span class="c1"># display station name</span>
+    <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">station</span><span class="o">.</span><span class="n">network</span><span class="p">,</span> <span class="n">station</span><span class="o">.</span><span class="n">station</span><span class="p">])</span>
+    <span class="n">pyplot</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span><span class="mf">0.50</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">)</span>
+
+    <span class="c1"># display distance</span>
+    <span class="k">if</span> <span class="n">distance_in_m</span> <span class="o">&gt;</span> <span class="mi">10000</span><span class="p">:</span>
+        <span class="n">distance</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> km&#39;</span> <span class="o">%</span> <span class="nb">round</span><span class="p">(</span><span class="n">distance_in_m</span><span class="o">/</span><span class="mf">1000.</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">distance_in_m</span> <span class="o">&gt;</span> <span class="mi">1000</span><span class="p">:</span>
+        <span class="n">distance</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> km&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">distance_in_m</span><span class="o">/</span><span class="mf">1000.</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">distance</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1"> km&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">distance_in_m</span><span class="o">/</span><span class="mf">1000.</span><span class="p">)</span>
+
+    <span class="n">pyplot</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span><span class="mf">0.35</span><span class="p">,</span> <span class="n">distance</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">)</span>
+
+    <span class="c1"># display azimuth</span>
+    <span class="n">azimuth</span> <span class="o">=</span>  <span class="s1">&#39;</span><span class="si">%d%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">azimuth</span><span class="p">),</span> <span class="sa">u</span><span class="s1">&#39;</span><span class="se">\N{DEGREE SIGN}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">pyplot</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span><span class="mf">0.20</span><span class="p">,</span> <span class="n">azimuth</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">)</span>
+
+
+
+<span class="k">def</span> <span class="nf">add_trace_labels</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">syn</span><span class="p">,</span> <span class="n">total_misfit</span><span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Adds CAP-style annotations to current axes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ymin</span> <span class="o">=</span> <span class="n">axis</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="n">syn</span><span class="o">.</span><span class="n">data</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">dat</span><span class="o">.</span><span class="n">data</span>
+
+    <span class="c1"># display cross-correlation time shift</span>
+    <span class="n">time_shift</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="n">time_shift</span> <span class="o">+=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">syn</span><span class="p">,</span> <span class="s1">&#39;time_shift&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+    <span class="n">time_shift</span> <span class="o">+=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="s1">&#39;static_time_shift&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">axis</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.</span><span class="p">,(</span><span class="mi">1</span><span class="o">/</span><span class="mf">4.</span><span class="p">)</span><span class="o">*</span><span class="n">ymin</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span><span class="n">time_shift</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+
+    <span class="c1"># display maximum cross-correlation coefficient</span>
+    <span class="n">Ns</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">s</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
+    <span class="n">Nd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="n">d</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
+    <span class="k">if</span> <span class="n">Ns</span><span class="o">*</span><span class="n">Nd</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">:</span>
+        <span class="n">max_cc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">correlate</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="s1">&#39;valid&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">max_cc</span> <span class="o">/=</span> <span class="p">(</span><span class="n">Ns</span><span class="o">*</span><span class="n">Nd</span><span class="p">)</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.</span><span class="p">,(</span><span class="mi">2</span><span class="o">/</span><span class="mf">4.</span><span class="p">)</span><span class="o">*</span><span class="n">ymin</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span><span class="n">max_cc</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">max_cc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.</span><span class="p">,(</span><span class="mi">2</span><span class="o">/</span><span class="mf">4.</span><span class="p">)</span><span class="o">*</span><span class="n">ymin</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span><span class="n">max_cc</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+
+    <span class="c1"># display percent of total misfit</span>
+    <span class="n">misfit</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">syn</span><span class="p">,</span> <span class="s1">&#39;misfit&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+    <span class="n">misfit</span> <span class="o">/=</span> <span class="n">total_misfit</span>
+    <span class="k">if</span> <span class="n">misfit</span> <span class="o">&gt;=</span> <span class="mf">0.1</span><span class="p">:</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.</span><span class="p">,(</span><span class="mi">3</span><span class="o">/</span><span class="mf">4.</span><span class="p">)</span><span class="o">*</span><span class="n">ymin</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="mf">100.</span><span class="o">*</span><span class="n">misfit</span><span class="p">),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.</span><span class="p">,(</span><span class="mi">3</span><span class="o">/</span><span class="mf">4.</span><span class="p">)</span><span class="o">*</span><span class="n">ymin</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="mf">100.</span><span class="o">*</span><span class="n">misfit</span><span class="p">),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_set_components</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">greens</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="k">for</span> <span class="n">_i</span><span class="p">,</span> <span class="n">stream</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="n">components</span> <span class="o">=</span> <span class="n">get_components</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+        <span class="n">greens</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span><span class="o">.</span><span class="n">_set_components</span><span class="p">(</span><span class="n">components</span><span class="p">)</span>
+
+
+<span class="c1">#</span>
+<span class="c1"># utility functions</span>
+<span class="c1">#</span>
+
+<span class="k">def</span> <span class="nf">_time_stats</span><span class="p">(</span><span class="n">trace</span><span class="p">):</span>
+    <span class="c1"># returns time scheme</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="nb">float</span><span class="p">(</span><span class="n">trace</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">starttime</span><span class="p">),</span>
+        <span class="nb">float</span><span class="p">(</span><span class="n">trace</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">endtime</span><span class="p">),</span>
+        <span class="n">trace</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">npts</span><span class="p">,</span>
+        <span class="n">trace</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">delta</span><span class="p">,</span>
+        <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_count</span><span class="p">(</span><span class="n">datasets</span><span class="p">):</span>
+    <span class="c1"># remove any `None`s from list </span>
+    <span class="n">datasets</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">datasets</span><span class="p">))</span>
+
+    <span class="c1"># counts number of nonempty streams in dataset(s)</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">streams</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">datasets</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">stream</span> <span class="ow">in</span> <span class="n">streams</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">break</span>
+    <span class="k">return</span> <span class="n">count</span>
+
+
+<span class="k">def</span> <span class="nf">_isempty</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">dataset</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">_count</span><span class="p">([</span><span class="n">dataset</span><span class="p">])</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">EmptyDataset</span><span class="p">(</span><span class="n">defaultdict</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">0.</span>
+
+
+<span class="k">def</span> <span class="nf">_empty_dataset</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">EmptyDataset</span><span class="p">(</span><span class="n">Stream</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_max</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">syn</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span><span class="o">==</span><span class="nb">type</span><span class="p">(</span><span class="n">syn</span><span class="p">)</span><span class="o">==</span><span class="n">Trace</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="nb">abs</span><span class="p">(</span><span class="n">dat</span><span class="o">.</span><span class="n">max</span><span class="p">()),</span>
+            <span class="nb">abs</span><span class="p">(</span><span class="n">syn</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
+
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span><span class="o">==</span><span class="nb">type</span><span class="p">(</span><span class="n">syn</span><span class="p">)</span><span class="o">==</span><span class="n">Stream</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="nb">max</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">abs</span><span class="p">,</span> <span class="n">dat</span><span class="o">.</span><span class="n">max</span><span class="p">())),</span>
+            <span class="nb">max</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">abs</span><span class="p">,</span> <span class="n">syn</span><span class="o">.</span><span class="n">max</span><span class="p">())))</span>
+
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span><span class="o">==</span><span class="nb">type</span><span class="p">(</span><span class="n">syn</span><span class="p">)</span><span class="o">==</span><span class="n">Dataset</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="nb">abs</span><span class="p">(</span><span class="n">dat</span><span class="o">.</span><span class="n">max</span><span class="p">()),</span>
+            <span class="nb">abs</span><span class="p">(</span><span class="n">syn</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
+
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">EmptyDataset</span><span class="p">)</span> <span class="ow">and</span>\
+        <span class="nb">type</span><span class="p">(</span><span class="n">syn</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">EmptyDataset</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="nb">abs</span><span class="p">(</span><span class="n">dat</span><span class="o">.</span><span class="n">max</span><span class="p">()),</span>
+            <span class="nb">abs</span><span class="p">(</span><span class="n">syn</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span>
+
+
+
+<span class="k">def</span> <span class="nf">_hide_axes</span><span class="p">(</span><span class="n">axes</span><span class="p">):</span>
+    <span class="c1"># hides axes lines, ticks, and labels</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
+            <span class="n">col</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s1">&#39;top&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">col</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s1">&#39;right&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">col</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s1">&#39;bottom&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">col</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s1">&#39;left&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">col</span><span class="o">.</span><span class="n">get_xaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_ticks</span><span class="p">([])</span>
+            <span class="n">col</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_ticks</span><span class="p">([])</span>
+
+
+<span class="k">def</span> <span class="nf">get_column_widths</span><span class="p">(</span><span class="n">data_bw</span><span class="p">,</span> <span class="n">data_sw</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
+    <span class="c1"># creates argument used by pyplot.subplot</span>
+
+    <span class="k">for</span> <span class="n">_i</span><span class="p">,</span> <span class="n">stream</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data_bw</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">break</span>
+    <span class="k">for</span> <span class="n">_j</span><span class="p">,</span> <span class="n">stream</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data_sw</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">break</span>
+
+    <span class="n">stats_bw</span> <span class="o">=</span> <span class="n">data_bw</span><span class="p">[</span><span class="n">_i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stats</span>
+    <span class="n">stats_sw</span> <span class="o">=</span> <span class="n">data_sw</span><span class="p">[</span><span class="n">_j</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stats</span>
+    <span class="n">len_bw</span> <span class="o">=</span> <span class="n">stats_bw</span><span class="o">.</span><span class="n">endtime</span><span class="o">-</span><span class="n">stats_bw</span><span class="o">.</span><span class="n">starttime</span>
+    <span class="n">len_sw</span> <span class="o">=</span> <span class="n">stats_sw</span><span class="o">.</span><span class="n">endtime</span><span class="o">-</span><span class="n">stats_sw</span><span class="o">.</span><span class="n">starttime</span>
+
+    <span class="n">width</span> <span class="o">*=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">len_bw</span><span class="o">+</span><span class="mi">3</span><span class="o">*</span><span class="n">len_sw</span><span class="p">)</span><span class="o">**-</span><span class="mi">1</span>
+    <span class="n">len_bw</span> <span class="o">*=</span> <span class="n">width</span>
+    <span class="n">len_sw</span> <span class="o">*=</span> <span class="n">width</span>
+
+    <span class="k">return</span>\
+        <span class="p">[</span><span class="n">len_bw</span><span class="p">,</span> <span class="n">len_bw</span><span class="p">,</span> <span class="n">len_sw</span><span class="p">,</span> <span class="n">len_sw</span><span class="p">,</span> <span class="n">len_sw</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_get_tag</span><span class="p">(</span><span class="n">tags</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">:</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">tag</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">pattern</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

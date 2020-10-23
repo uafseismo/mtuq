@@ -1,0 +1,6 @@
+mtuq.misfit.level2._corr_1_2
+============================
+
+.. currentmodule:: mtuq.misfit.level2
+
+.. autofunction:: _corr_1_2

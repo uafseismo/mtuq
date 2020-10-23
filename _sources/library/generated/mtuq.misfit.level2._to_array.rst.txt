@@ -1,0 +1,6 @@
+mtuq.misfit.level2._to_array
+============================
+
+.. currentmodule:: mtuq.misfit.level2
+
+.. autofunction:: _to_array

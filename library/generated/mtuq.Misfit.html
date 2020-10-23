@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mtuq.Misfit &#8212; MTUQ Documentation</title>
+    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/style.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          MTUQ</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quick_start.html">Quick start</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/01.html">Learning ObsPy and MTUQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/02.html">Acquiring seismic data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/03.html">Acquiring Green’s functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/04.html">Data processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Library reference</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">mtuq.Misfit</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="section" id="mtuq-misfit">
+<h1>mtuq.Misfit<a class="headerlink" href="#mtuq-misfit" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="mtuq.Misfit">
+<em class="property">class </em><code class="sig-prename descclassname">mtuq.</code><code class="sig-name descname">Misfit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">norm</span><span class="o">=</span><span class="default_value">'hybrid'</span></em>, <em class="sig-param"><span class="n">time_shift_groups</span><span class="o">=</span><span class="default_value">['ZRT']</span></em>, <em class="sig-param"><span class="n">time_shift_min</span><span class="o">=</span><span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">time_shift_max</span><span class="o">=</span><span class="default_value">0.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mtuq/misfit.html#Misfit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtuq.Misfit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Data misfit function</p>
+<p>Evaluates misfit between data and synthetics using time shifts followed by
+waveform differences. This approach, due to <cite>ZhaoHelmberger1994</cite> and 
+<cite>ZhuHelmberger1996</cite>, has become widely used in regional seismology.  See 
+<cite>docs/</cite> and <cite>docs/references</cite> for more information.</p>
+<p class="rubric">Usage</p>
+<p>Evaluating misfit is a two-step procedure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">function_handle</span> <span class="o">=</span> <span class="n">Misfit</span><span class="p">(</span><span class="o">**</span><span class="n">parameters</span><span class="p">)</span>
+<span class="n">values</span> <span class="o">=</span> <span class="n">function_handle</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">greens</span><span class="p">,</span> <span class="n">sources</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In the first step, the user supplies parameters such as the type of norm
+(see below for detailed argument descriptions).</p>
+<p>In the second step, the user supplies data, Green’s functions, and sources.
+Synthetics are then generated and compared with data, and a NumPy array of 
+misfit values is returned of the same length as <cite>sources</cite>.</p>
+<p class="rubric">Parameters</p>
+<p><code class="docutils literal notranslate"><span class="pre">norm</span></code> (<cite>str</cite>)</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">'L2'</span></code>: conventional L2 norm (fast)</p></li>
+</ul>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">'L1'</span></code>: conventional L1 norm (slow)</p></li>
+</ul>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">'hybrid'</span></code>: hybrid L1-L2 norm (much faster than L1 but still robust)</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">time_shift_groups</span></code> (<cite>list</cite>)</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">['ZRT']</span></code>: forces all three components to have the same time shift</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">['ZR','T'</span></code>]: forces vertical and radial components to have the same
+time shift, while transverse time shift is allowed to vary independently</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">['Z','R','T']</span></code>: allows time shifts of all three components to vary
+independently</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">time_shift_min</span></code> (<cite>float</cite>): minimum allowable time shift (s)</p>
+<p><code class="docutils literal notranslate"><span class="pre">time_shift_max</span></code> (<cite>float</cite>): maximum allowable time shift (s)</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In our convention, a positive time shift means synthetics are arriving 
+too early and need to be shifted forward in time to match the observed
+data.</p>
+</div>
+<p class="rubric">Optimization Levels</p>
+<p>Misfit evaluation is the most complex and computationally expensive task
+performed by this software. As a result we offer three different
+implementations:</p>
+<ul class="simple">
+<li><p>a readable pure Python version (<code class="docutils literal notranslate"><span class="pre">mtuq.misfit.level0</span></code>)</p></li>
+<li><p>a fast pure Python version (<code class="docutils literal notranslate"><span class="pre">mtuq.misfit.level1</span></code>)</p></li>
+<li><p>a very fast Python/C++ version (<code class="docutils literal notranslate"><span class="pre">mtuq.misfit.level2</span></code>)</p></li>
+</ul>
+<p>While the same in terms of input argument syntax, these three versions
+differ in terms of performance:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">level0</span></code> provides a reference for understanding what the code is doing
+and for checking the correctness of the fast implementations</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">level1</span></code> is an optimized pure Python implementation which provides 
+significant computational savings when <cite>len(sources)</cite> &gt; 100. This
+version is the closest to <cite>ZhuHelmberger1996</cite>’s original C software.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">level2</span></code> is an optimized Python/C++ implementation, in which a Python 
+wrapper is used to combine obspy traces into multidimensional arrays.
+These arrays are passed to a C++ extension module, which does the
+main computational work. Unlike the other two versions, this 
+implementation requires that all obspy Traces have the same time
+discretization</p></li>
+</ul>
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

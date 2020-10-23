@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mtuq.graphics.uq.vw &#8212; MTUQ Documentation</title>
+    <link rel="stylesheet" href="../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/style.css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../../index.html">
+          MTUQ</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install/index.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quick_start.html">Quick start</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user_guide/01.html">Learning ObsPy and MTUQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user_guide/02.html">Acquiring seismic data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user_guide/03.html">Acquiring Green’s functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user_guide/04.html">Data processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../library/index.html">Library reference</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for mtuq.graphics.uq.vw</h1><div class="highlight"><pre>
+<span></span>
+<span class="c1">#</span>
+<span class="c1"># graphics/uq/vw.py - uncertainty quantification on the v-w rectangle</span>
+<span class="c1">#</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+<span class="kn">from</span> <span class="nn">xarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
+<span class="kn">from</span> <span class="nn">mtuq.graphics.uq._gmt</span> <span class="kn">import</span> <span class="n">_nothing_to_plot</span>
+<span class="kn">from</span> <span class="nn">mtuq.grid_search</span> <span class="kn">import</span> <span class="n">MTUQDataArray</span><span class="p">,</span> <span class="n">MTUQDataFrame</span>
+<span class="kn">from</span> <span class="nn">mtuq.util.math</span> <span class="kn">import</span> <span class="n">closed_interval</span><span class="p">,</span> <span class="n">open_interval</span>
+
+
+<span class="c1">#</span>
+<span class="c1"># For details about the  rectangle:`v-w` rectangle rectangle, see </span>
+<span class="c1"># Tape2015 - A uniform parameterization of moment tensors</span>
+<span class="c1"># (https://doi.org/10.1093/gji/ggv262)</span>
+<span class="c1">#</span>
+
+<span class="n">v_min</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.</span><span class="o">/</span><span class="mf">3.</span>
+<span class="n">v_max</span> <span class="o">=</span> <span class="o">+</span><span class="mf">1.</span><span class="o">/</span><span class="mf">3.</span>
+<span class="n">w_min</span> <span class="o">=</span> <span class="o">-</span><span class="mf">3.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">8.</span>
+<span class="n">w_max</span> <span class="o">=</span> <span class="o">+</span><span class="mf">3.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">8.</span>
+<span class="n">vw_area</span> <span class="o">=</span> <span class="p">(</span><span class="n">v_max</span><span class="o">-</span><span class="n">v_min</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">w_max</span><span class="o">-</span><span class="n">w_min</span><span class="p">)</span>
+
+
+
+<div class="viewcode-block" id="plot_misfit_vw"><a class="viewcode-back" href="../../../../library/generated/mtuq.graphics.plot_misfit_vw.html#mtuq.graphics.plot_misfit_vw">[docs]</a><span class="k">def</span> <span class="nf">plot_misfit_vw</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Plots misfit values on `v-w` rectangle</span>
+
+
+<span class="sd">    .. rubric :: Input arguments</span>
+
+<span class="sd">    ``filename`` (`str`):</span>
+<span class="sd">    Name of output image file</span>
+
+<span class="sd">    ``ds`` (`DataArray` or `DataFrame`):</span>
+<span class="sd">    data structure containing moment tensors and corresponding misfit values</span>
+
+<span class="sd">    ``title`` (`str`):</span>
+<span class="sd">    Optional figure title</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_check</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">ds</span><span class="p">),</span> <span class="n">DataArray</span><span class="p">):</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;origin_idx&#39;</span><span class="p">,</span> <span class="s1">&#39;rho&#39;</span><span class="p">,</span> <span class="s1">&#39;kappa&#39;</span><span class="p">,</span> <span class="s1">&#39;sigma&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">))</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">]</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+
+    <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">ds</span><span class="p">),</span> <span class="n">DataFrame</span><span class="p">):</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="n">_bin</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">ds</span><span class="p">:</span> <span class="n">ds</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+
+    <span class="n">_plot_misfit_vw</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="plot_likelihood_vw"><a class="viewcode-back" href="../../../../library/generated/mtuq.graphics.plot_likelihood_vw.html#mtuq.graphics.plot_likelihood_vw">[docs]</a><span class="k">def</span> <span class="nf">plot_likelihood_vw</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Plots maximum likelihoods on `v-w` rectangle</span>
+
+
+<span class="sd">    .. rubric :: Input arguments</span>
+
+<span class="sd">    ``filename`` (`str`):</span>
+<span class="sd">    Name of output image file</span>
+
+<span class="sd">    ``ds`` (`DataArray` or `DataFrame`):</span>
+<span class="sd">    data structure containing moment tensors and corresponding misfit values</span>
+
+<span class="sd">    ``title`` (`str`):</span>
+<span class="sd">    Optional figure title</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">sigma</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+    <span class="n">_check</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">ds</span><span class="p">),</span> <span class="n">DataArray</span><span class="p">):</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">ds</span><span class="o">.</span><span class="n">values</span><span class="o">/</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">values</span> <span class="o">/=</span> <span class="n">ds</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;origin_idx&#39;</span><span class="p">,</span> <span class="s1">&#39;rho&#39;</span><span class="p">,</span> <span class="s1">&#39;kappa&#39;</span><span class="p">,</span> <span class="s1">&#39;sigma&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">))</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">]</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+
+    <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">ds</span><span class="p">),</span> <span class="n">DataFrame</span><span class="p">):</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">ds</span><span class="o">/</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+        <span class="n">ds</span> <span class="o">/=</span> <span class="n">ds</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="n">_bin</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">ds</span><span class="p">:</span> <span class="n">ds</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+
+    <span class="n">values</span> <span class="o">/=</span> <span class="n">values</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">values</span> <span class="o">/=</span> <span class="n">vw_area</span>
+
+    <span class="n">_plot_likelihood_vw</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="plot_marginal_vw"><a class="viewcode-back" href="../../../../library/generated/mtuq.graphics.plot_marginal_vw.html#mtuq.graphics.plot_marginal_vw">[docs]</a><span class="k">def</span> <span class="nf">plot_marginal_vw</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Plots marginal likelihoods on `v-w` rectangle</span>
+
+
+<span class="sd">    .. rubric :: Input arguments</span>
+
+<span class="sd">    ``filename`` (`str`):</span>
+<span class="sd">    Name of output image file</span>
+
+<span class="sd">    ``ds`` (`DataArray` or `DataFrame`):</span>
+<span class="sd">    data structure containing moment tensors and corresponding misfit values</span>
+
+<span class="sd">    ``title`` (`str`):</span>
+<span class="sd">    Optional figure title</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">sigma</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+    <span class="n">_check</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">ds</span><span class="p">),</span> <span class="n">DataArray</span><span class="p">):</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">ds</span><span class="o">.</span><span class="n">values</span><span class="o">/</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">values</span> <span class="o">/=</span> <span class="n">ds</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;origin_idx&#39;</span><span class="p">,</span> <span class="s1">&#39;rho&#39;</span><span class="p">,</span> <span class="s1">&#39;kappa&#39;</span><span class="p">,</span> <span class="s1">&#39;sigma&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">))</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">]</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+
+    <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">ds</span><span class="p">),</span> <span class="n">DataFrame</span><span class="p">):</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">ds</span><span class="o">/</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+        <span class="n">ds</span> <span class="o">/=</span> <span class="n">ds</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="n">_bin</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">ds</span><span class="p">:</span> <span class="n">ds</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="p">))</span>
+
+    <span class="n">values</span> <span class="o">/=</span> <span class="n">values</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">values</span> <span class="o">/=</span> <span class="n">vw_area</span>
+
+    <span class="n">_plot_likelihood_vw</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span></div>
+
+
+
+<span class="c1">#</span>
+<span class="c1"># pyplot wrappers</span>
+<span class="c1">#</span>
+
+<span class="k">def</span> <span class="nf">_plot_misfit_vw</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span>
+    <span class="n">colorbar_type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">marker_type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">_nothing_to_plot</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+        <span class="k">return</span>
+
+    <span class="n">_plot_vw</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> 
+        <span class="n">colorbar_type</span><span class="o">=</span><span class="n">colorbar_type</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;hot&#39;</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">marker_type</span><span class="p">:</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">argmin</span><span class="p">(),</span> <span class="n">values</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">idx</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">w</span><span class="p">[</span><span class="n">idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+
+        <span class="n">pyplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">coords</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span>
+            <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span>
+            <span class="n">facecolors</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+            <span class="n">edgecolors</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">linewidths</span><span class="o">=</span><span class="mf">1.75</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="n">pyplot</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">pyplot</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_plot_likelihood_vw</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span>
+    <span class="n">colorbar_type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">marker_type</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">_nothing_to_plot</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+        <span class="k">return</span>
+
+    <span class="n">_plot_vw</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> 
+        <span class="n">colorbar_type</span><span class="o">=</span><span class="n">colorbar_type</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;hot_r&#39;</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">marker_type</span><span class="p">:</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">argmax</span><span class="p">(),</span> <span class="n">values</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">idx</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">w</span><span class="p">[</span><span class="n">idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+
+        <span class="n">pyplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">coords</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span>
+            <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> 
+            <span class="n">facecolors</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+            <span class="n">edgecolors</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">linewidths</span><span class="o">=</span><span class="mf">1.75</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="n">pyplot</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_plot_vw</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">colorbar_type</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;hot&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="c1"># create figure</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">pyplot</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">3.</span><span class="p">,</span> <span class="mf">8.</span><span class="p">),</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># pcolor requires corners of pixels</span>
+    <span class="n">corners_v</span> <span class="o">=</span> <span class="n">_centers_to_edges</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="n">corners_w</span> <span class="o">=</span> <span class="n">_centers_to_edges</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+
+    <span class="c1"># `values` gets mapped to pixel colors</span>
+    <span class="n">pyplot</span><span class="o">.</span><span class="n">pcolor</span><span class="p">(</span><span class="n">corners_v</span><span class="p">,</span> <span class="n">corners_w</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
+
+    <span class="c1"># v and w have the following bounds</span>
+    <span class="c1"># (see https://doi.org/10.1093/gji/ggv262)</span>
+    <span class="n">pyplot</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="o">-</span><span class="mf">1.</span><span class="o">/</span><span class="mf">3.</span><span class="p">,</span> <span class="mf">1.</span><span class="o">/</span><span class="mf">3.</span><span class="p">])</span>
+    <span class="n">pyplot</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="o">-</span><span class="mf">3.</span><span class="o">/</span><span class="mf">8.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mf">3.</span><span class="o">/</span><span class="mf">8.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">])</span>
+
+    <span class="n">pyplot</span><span class="o">.</span><span class="n">xticks</span><span class="p">([],</span> <span class="p">[])</span>
+    <span class="n">pyplot</span><span class="o">.</span><span class="n">yticks</span><span class="p">([],</span> <span class="p">[])</span>
+
+    <span class="k">if</span> <span class="n">colorbar_type</span><span class="p">:</span>
+        <span class="n">pyplot</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span>
+            <span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;horizontal&#39;</span><span class="p">,</span>
+            <span class="n">pad</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
+        <span class="n">fontdict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;fontsize&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">}</span>
+        <span class="n">pyplot</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="n">fontdict</span><span class="p">)</span>
+
+
+
+<span class="c1"># utility functions</span>
+
+<span class="k">def</span> <span class="nf">_check</span><span class="p">(</span><span class="n">ds</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Checks data structures</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">MTUQDataArray</span><span class="p">,</span> <span class="n">MTUQDataFrame</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Unexpected grid format&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_bin</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="n">npts_v</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">npts_w</span><span class="o">=</span><span class="mi">40</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Bins DataFrame into rectangular cells</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># define centers of cells</span>
+    <span class="n">centers_v</span> <span class="o">=</span> <span class="n">open_interval</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span><span class="o">/</span><span class="mf">3.</span><span class="p">,</span> <span class="mf">1.</span><span class="o">/</span><span class="mf">3.</span><span class="p">,</span> <span class="n">npts_v</span><span class="p">)</span>
+    <span class="n">centers_w</span> <span class="o">=</span> <span class="n">open_interval</span><span class="p">(</span><span class="o">-</span><span class="mf">3.</span><span class="o">/</span><span class="mf">8.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mf">3.</span><span class="o">/</span><span class="mf">8.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">npts_w</span><span class="p">)</span>
+
+    <span class="c1"># define corners of cells</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">closed_interval</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span><span class="o">/</span><span class="mf">3.</span><span class="p">,</span> <span class="mf">1.</span><span class="o">/</span><span class="mf">3.</span><span class="p">,</span> <span class="n">npts_v</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">closed_interval</span><span class="p">(</span><span class="o">-</span><span class="mf">3.</span><span class="o">/</span><span class="mf">8.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mf">3.</span><span class="o">/</span><span class="mf">8.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">npts_w</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">binned</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">npts_w</span><span class="p">,</span> <span class="n">npts_v</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">npts_w</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">_j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">npts_v</span><span class="p">):</span>
+            <span class="c1"># which grid points lie within cell (i,j)?</span>
+            <span class="n">subset</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                <span class="n">df</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">_j</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="n">_j</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span> <span class="o">&amp;</span>
+                <span class="n">df</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="n">_i</span><span class="p">],</span> <span class="n">w</span><span class="p">[</span><span class="n">_i</span><span class="o">+</span><span class="mi">1</span><span class="p">])]</span>
+
+            <span class="n">binned</span><span class="p">[</span><span class="n">_i</span><span class="p">,</span> <span class="n">_j</span><span class="p">]</span> <span class="o">=</span> <span class="n">handle</span><span class="p">(</span><span class="n">subset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">centers_v</span><span class="p">,</span> <span class="n">centers_w</span><span class="p">,</span> <span class="n">binned</span>
+
+
+<span class="k">def</span> <span class="nf">_centers_to_edges</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">DataArray</span><span class="p">):</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">dv</span> <span class="o">=</span> <span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">v</span> <span class="o">-=</span> <span class="n">dv</span><span class="o">/</span><span class="mi">2</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">v</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">dv</span>
+
+    <span class="k">return</span> <span class="n">v</span>
+
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

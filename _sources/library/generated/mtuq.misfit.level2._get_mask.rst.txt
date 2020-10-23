@@ -1,0 +1,6 @@
+mtuq.misfit.level2._get_mask
+============================
+
+.. currentmodule:: mtuq.misfit.level2
+
+.. autofunction:: _get_mask

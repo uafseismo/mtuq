@@ -1,0 +1,6 @@
+mtuq.misfit.level1.Helper.get_L1_norm
+=====================================
+
+.. currentmodule:: mtuq.misfit.level1
+
+.. automethod:: Helper.get_L1_norm

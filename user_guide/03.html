@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Acquiring Green’s functions &#8212; MTUQ Documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Data processing" href="04.html" />
+    <link rel="prev" title="Acquiring seismic data" href="02.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          MTUQ</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick_start.html">Quick start</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="01.html">Learning ObsPy and MTUQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02.html">Acquiring seismic data</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Acquiring Green’s functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04.html">Data processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/index.html">Library reference</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Acquiring Green’s functions</a><ul>
+<li><a class="reference internal" href="#role-of-green-s-functions">Role of Green’s functions</a></li>
+<li><a class="reference internal" href="#greenstensor-objects"><cite>GreensTensor</cite> objects</a></li>
+<li><a class="reference internal" href="#downloading-precomputed-green-s-functions">Downloading precomputed Green’s functions</a></li>
+<li><a class="reference internal" href="#computing-green-s-functions-from-1d-earth-models">Computing Green’s functions from 1D Earth models</a></li>
+<li><a class="reference internal" href="#computing-green-s-functions-from-3d-earth-models">Computing Green’s functions from 3D Earth models</a></li>
+<li><a class="reference internal" href="#green-s-function-conventions">Green’s function conventions</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="02.html" title="Previous Chapter: Acquiring seismic data"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Acquiring sei...</span>
+    </a>
+  </li>
+  <li>
+    <a href="04.html" title="Next Chapter: Data processing"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Data processing &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="section" id="acquiring-green-s-functions">
+<h1>Acquiring Green’s functions<a class="headerlink" href="#acquiring-green-s-functions" title="Permalink to this headline">¶</a></h1>
+<p>The response of a medium to an impulsive source is called a Green’s function.  This page describes the role of Green’s functions in source inversions, the types of Green’s functions supported by MTUQ, and how these types can be obtained.</p>
+<div class="section" id="role-of-green-s-functions">
+<h2>Role of Green’s functions<a class="headerlink" href="#role-of-green-s-functions" title="Permalink to this headline">¶</a></h2>
+<p>By combining Green’s functions (which represent the medium response to simple impulsive sources), it is possible to obtain synthetics from any source, however complex. This type of linear combination is useful because it provides computaional savings: it’s generally less expensive to generate synthetics by combining Green’s functions than it is to perform on-the-fly wavefield simulations.</p>
+</div>
+<div class="section" id="greenstensor-objects">
+<h2><cite>GreensTensor</cite> objects<a class="headerlink" href="#greenstensor-objects" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://uafgeotools.github.io/mtuq/library/generated/mtuq.GreensTensor.html">GreensTensor</a> objects provide access to an entire set of Green’s functions needed to describe the medium response between a given station and origin.</p>
+<p>Methods built into the <cite>GreensTensor</cite> class allow data processing and synthetics generation.  In particular, the <a class="reference external" href="https://uafgeotools.github.io/mtuq/library/generated/mtuq.GreensTensor.get_synthetics.html#mtuq.GreensTensor.get_synthetics">get_synthetics</a> method accepts a <cite>MomentTensor</cite> and returns traces representing the response at the given station.</p>
+</div>
+<div class="section" id="downloading-precomputed-green-s-functions">
+<h2>Downloading precomputed Green’s functions<a class="headerlink" href="#downloading-precomputed-green-s-functions" title="Permalink to this headline">¶</a></h2>
+<p>One of the easiest ways to acquire Green’s functions is to download them using <a class="reference external" href="http://ds.iris.edu/ds/products/syngine/">syngine</a>, a webservice that hosts Green’s functions from the following 1D Earth models: PREM, AK135, and iasp91.</p>
+<p>To download AK135 Green’s functions and generate MTUQ <cite>GreenTensor</cite> objects:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mtuq</span> <span class="kn">import</span> <span class="n">download_greens_functions</span>
+<span class="n">greens_tensors</span> <span class="o">=</span> <span class="n">download_greens_functions</span><span class="p">(</span><span class="n">stations</span><span class="p">,</span> <span class="n">origins</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;ak135f_2s&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Besides providing only a handful of Earth models, another limitation of syngine is that Green’s functions can be downloaded only on a station-by-station basis, not over the whole Earth.  As described below, an alternative method for acquiring Green’s functions, which completely avoids these limitations, is to perform your own Green’s functions simulations.</p>
+</div>
+<div class="section" id="computing-green-s-functions-from-1d-earth-models">
+<h2>Computing Green’s functions from 1D Earth models<a class="headerlink" href="#computing-green-s-functions-from-1d-earth-models" title="Permalink to this headline">¶</a></h2>
+<p>MTUQ supports the following 1D Green’s functions formats: AxiSEM (preferred) and FK.</p>
+<p><a class="reference external" href="https://github.com/geodynamics/axisem">AxiSEM</a> simulates wave propagation in radially-symmeric Earth models using a spectral-element method.  To generate synthetics in a format MTUQ natively supports, follow the instructions for in the <a class="reference external" href="https://geodynamics.org/cig/software/axisem/axisem-manual.pdf">AxiSEM user manual</a>  under “Output wavefields in NetCDF formated needed by instaseis.”  AxiSEM NetCDF files can be used to retrieve vertical, radial, and transverse  displacement in units of m*(N-m)^-1.</p>
+<p>To open an AxiSEM database client in MTUQ:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mtuq</span> <span class="kn">import</span> <span class="n">open_db</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">open_db</span><span class="p">(</span><span class="n">path_to_NetCDF_file</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;AxiSEM&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="https://www.eas.slu.edu/People/LZhu/home.html">FK</a> simulates wave propagation in horizontally-layered elastic media using a frequency-wavenumber method.   FK  simulations create SAC files in a directory tree organized by model, event depth, and event distance.  Each SAC file represents a vertical, radial, or transverse velocity time series in units of 10^-20*cm*(dyne-cm)^-1 s^-1.</p>
+<p>To open an FK database client in MTUQ:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mtuq</span> <span class="kn">import</span> <span class="n">open_db</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">open_db</span><span class="p">(</span><span class="n">path_to_FK_directory_tree</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;FK&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Once opened, an AxiSEM or FK database client can be used to generate <a class="reference external" href="https://uafgeotools.github.io/mtuq/library/generated/mtuq.GreensTensor.html">GreensTensor</a> objects as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">greens_tensors</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_greens_tensors</span><span class="p">(</span><span class="n">stations</span><span class="p">,</span> <span class="n">origin</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="computing-green-s-functions-from-3d-earth-models">
+<h2>Computing Green’s functions from 3D Earth models<a class="headerlink" href="#computing-green-s-functions-from-3d-earth-models" title="Permalink to this headline">¶</a></h2>
+<p>MTUQ currently supports 3D Green’s functions from SPECFEM3D.</p>
+<p>To generate a complete Green’s function database for a given hypocenter and depth, six SPECFEM3D wavefield simulations are required.  Output must be saved as SAC files at individual stations using the following filename convention, which comes from <a class="reference external" href="https://github.com/UTCompSeismo/GRD_CMT3D/tree/master/cmt3d">GRD_CMT3D</a>.  Place all SAC files corresponding to a single hypocenter and depth in the same directory as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="n">basedir</span><span class="p">}</span><span class="o">/</span><span class="p">{</span><span class="n">event_id</span><span class="p">}</span><span class="o">/</span>
+    <span class="p">{</span><span class="n">net</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">sta</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">loc</span><span class="p">}</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">Mrr</span><span class="o">.</span><span class="n">sac</span>
+    <span class="p">{</span><span class="n">net</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">sta</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">loc</span><span class="p">}</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">Mtt</span><span class="o">.</span><span class="n">sac</span>
+    <span class="p">{</span><span class="n">net</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">sta</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">loc</span><span class="p">}</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">Mpp</span><span class="o">.</span><span class="n">sac</span>
+    <span class="p">{</span><span class="n">net</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">sta</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">loc</span><span class="p">}</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">Mrt</span><span class="o">.</span><span class="n">sac</span>
+    <span class="p">{</span><span class="n">net</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">sta</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">loc</span><span class="p">}</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">Mrp</span><span class="o">.</span><span class="n">sac</span>
+    <span class="p">{</span><span class="n">net</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">sta</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">loc</span><span class="p">}</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">Mtp</span><span class="o">.</span><span class="n">sac</span>
+    <span class="p">{</span><span class="n">net</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">sta</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">loc</span><span class="p">}</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">Mrr</span><span class="o">.</span><span class="n">sac</span>
+    <span class="p">{</span><span class="n">net</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">sta</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">loc</span><span class="p">}</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">Mtt</span><span class="o">.</span><span class="n">sac</span>
+    <span class="p">{</span><span class="n">net</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">sta</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">loc</span><span class="p">}</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">Mpp</span><span class="o">.</span><span class="n">sac</span>
+    <span class="p">{</span><span class="n">net</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">sta</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">loc</span><span class="p">}</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">Mrt</span><span class="o">.</span><span class="n">sac</span>
+    <span class="p">{</span><span class="n">net</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">sta</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">loc</span><span class="p">}</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">Mrp</span><span class="o">.</span><span class="n">sac</span>
+    <span class="p">{</span><span class="n">net</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">sta</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">loc</span><span class="p">}</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">Mtp</span><span class="o">.</span><span class="n">sac</span>
+    <span class="p">{</span><span class="n">net</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">sta</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">loc</span><span class="p">}</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">Mrr</span><span class="o">.</span><span class="n">sac</span>
+    <span class="p">{</span><span class="n">net</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">sta</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">loc</span><span class="p">}</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">Mtt</span><span class="o">.</span><span class="n">sac</span>
+    <span class="p">{</span><span class="n">net</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">sta</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">loc</span><span class="p">}</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">Mpp</span><span class="o">.</span><span class="n">sac</span>
+    <span class="p">{</span><span class="n">net</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">sta</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">loc</span><span class="p">}</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">Mrt</span><span class="o">.</span><span class="n">sac</span>
+    <span class="p">{</span><span class="n">net</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">sta</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">loc</span><span class="p">}</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">Mrp</span><span class="o">.</span><span class="n">sac</span>
+    <span class="p">{</span><span class="n">net</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">sta</span><span class="p">}</span><span class="o">.</span><span class="p">{</span><span class="n">loc</span><span class="p">}</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">Mtp</span><span class="o">.</span><span class="n">sac</span>
+</pre></div>
+</div>
+<p>To open an SPECFEM3D database client in MTUQ:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mtuq</span> <span class="kn">import</span> <span class="n">open_db</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">open_db</span><span class="p">(</span><span class="n">path_SPECFEM3D_output_directory</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;SPECFEM3D&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Once opened, a SPECFEM3D database client can be used to generate <a class="reference external" href="https://uafgeotools.github.io/mtuq/library/generated/mtuq.GreensTensor.html">GreensTensor</a> objects as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">greens_tensors</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_greens_tensors</span><span class="p">(</span><span class="n">stations</span><span class="p">,</span> <span class="n">origin</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="green-s-function-conventions">
+<h2>Green’s function conventions<a class="headerlink" href="#green-s-function-conventions" title="Permalink to this headline">¶</a></h2>
+<p>A variety of Green’s function conventions exist.  Figuring out which are used in a particular application can be challenging because it depends on</p>
+<ul class="simple">
+<li><p>the type of medium under consideration (for example, acoustic media require fewer independent Green’s functions than elastic media)</p></li>
+<li><p>the choice of local Cartesian basis conventions (for example, some authors employ <cite>up-south-east</cite>, others <cite>north-east-down</cite>; see <a class="reference external" href="https://docs.obspy.org/packages/autogen/obspy.imaging.mopad_wrapper.beach.html#supported-basis-systems">ObsPy documentation</a> for more information)</p></li>
+</ul>
+<p>A major goal is to avoid exposing users to unnecessary basis complexity. MTUQ accomplishes this by understanding external formats and converting to a common internal format that works for both 1D and 3D media.</p>
+<p>For internally storing moment tensors, forces, and Green’s functions, MTUQ consistently uses an <cite>up-south-east</cite> Cartesian convention.</p>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

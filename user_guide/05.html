@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Uncertainty visualization &#8212; MTUQ Documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          MTUQ</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick_start.html">Quick start</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="01.html">Learning ObsPy and MTUQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02.html">Acquiring seismic data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03.html">Acquiring Green’s functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04.html">Data processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/index.html">Library reference</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Uncertainty visualization</a><ul>
+<li><a class="reference internal" href="#passing-misfit-values">Passing misfit values</a></li>
+<li><a class="reference internal" href="#data-structure-requirements">Data structure requirements</a></li>
+<li><a class="reference internal" href="#converting-misfit-values-to-likelihoods">Converting misfit values to likelihoods</a></li>
+<li><a class="reference internal" href="#output-image-formats">Output image formats</a></li>
+<li><a class="reference internal" href="#library-reference-links">Library reference links</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="section" id="uncertainty-visualization">
+<h1>Uncertainty visualization<a class="headerlink" href="#uncertainty-visualization" title="Permalink to this headline">¶</a></h1>
+<p>MTUQ provides utilities for visualizing full moment tensor, double couple, force, hypocenter, and depth uncertainties.</p>
+<p>Brief descriptions of all these plotting functions can accessed through the library reference links below.</p>
+<div class="section" id="passing-misfit-values">
+<h2>Passing misfit values<a class="headerlink" href="#passing-misfit-values" title="Permalink to this headline">¶</a></h2>
+<p>Importantly, one input argument common to all visualization utilities is a data structure <cite>ds</cite>, which is expected to contain source parameters and corresponding L1 or L2 misfit values.</p>
+<p><cite>ds</cite> can be either of the following data types:</p>
+<ul class="simple">
+<li><p>an <cite>MTUQDataFrame</cite> (for irregularly-spaced grids)</p></li>
+<li><p>an <cite>MTUQDataArray</cite> (for regularly-spaced grids)</p></li>
+</ul>
+<p>As it happens, <cite>mtuq.grid_search</cite> returns these data structures automatically, with no additional user effort required.</p>
+<p>It happens that <cite>ds</cite> can also be either of the two parent classes, since subclass methods are not actually necessary for visualization:</p>
+<ul class="simple">
+<li><p>a pandas <cite>DataFrame</cite> (for irregularly-spaced grids)</p></li>
+<li><p>an xarray <cite>DataArray</cite> (for regularly-spaced grids)</p></li>
+</ul>
+</div>
+<div class="section" id="data-structure-requirements">
+<h2>Data structure requirements<a class="headerlink" href="#data-structure-requirements" title="Permalink to this headline">¶</a></h2>
+<p>Before doing anything else, plotting utilities check that the given data structure <cite>ds</cite> contains the expected parameters.</p>
+<p>What is expected varies depending on the utility.  For example, full moment tensor utilities expect the following paraemters: <cite>rho</cite>, <cite>v</cite>, <cite>w</cite>, <cite>kappa</cite>, <cite>sigma</cite>, <cite>h</cite>.</p>
+<p>To see which parameters are expected in a particular case, look for functions named <cite>_check</cite>  within <cite>mtuq/graphics/uq/</cite>.</p>
+</div>
+<div class="section" id="converting-misfit-values-to-likelihoods">
+<h2>Converting misfit values to likelihoods<a class="headerlink" href="#converting-misfit-values-to-likelihoods" title="Permalink to this headline">¶</a></h2>
+<p>All plotting utilities expect L1 or L2 misfit values, which must be passed through the input argument <cite>ds</cite>.</p>
+<p>Some utilities then take these misfit values and convert on-the-fly to maximum or marginal likelihoods.</p>
+<p><em>Current limitations</em></p>
+<ul class="simple">
+<li><p>only Guassian likelihood functions are implemented, which means that only L2 misfit values are accepted</p></li>
+<li><p>a diagonal covariance matrix, specified by the input argument <cite>sigma</cite>, is used to convert misfit to likelihood; off-diagonal covarience matrices are not yet implemented</p></li>
+</ul>
+</div>
+<div class="section" id="output-image-formats">
+<h2>Output image formats<a class="headerlink" href="#output-image-formats" title="Permalink to this headline">¶</a></h2>
+<p>In all plotting utilities, the output image format is determined from the extension of the given filename.  If the extension is missing or unrecognized, the format defaults to PNG.</p>
+</div>
+<div class="section" id="library-reference-links">
+<h2>Library reference links<a class="headerlink" href="#library-reference-links" title="Permalink to this headline">¶</a></h2>
+<p>For plotting L1 or L2 misfit values:
+- plot_misfit_lune
+- plot_misfit_vw
+- plot_misfit_dc
+- plot_misfit_force
+- plot_misfit_xy
+- plot_misfit_depth</p>
+<p>Converts L2 misfit values to likelihoods, then plots maximum likelihoods:
+- plot_likelihood_lune
+- plot_likelihood_vw
+- plot_likelihood_dc
+- plot_likelihood_force
+- plot_likelihood_xy
+- plot_likelihood_depth</p>
+<p>Converts L2 misfit values to likelihoods, then plots marginal likelihoods:
+- plot_marginal_lune
+- plot_marginal_vw
+- plot_marginal_dc
+- plot_marginal_force
+- plot_marginal_xy
+- plot_marginal_depth</p>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

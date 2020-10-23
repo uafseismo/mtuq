@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>autogen &#8212; MTUQ Documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          MTUQ</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick_start.html">Quick start</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/01.html">Learning ObsPy and MTUQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/02.html">Acquiring seismic data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/03.html">Acquiring Green’s functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/04.html">Data processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Library reference</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">autogen</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="section" id="autogen">
+<h1>autogen<a class="headerlink" href="#autogen" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Classes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mtuq.Dataset.html#mtuq.Dataset" title="mtuq.Dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.Dataset</span></code></a>([streams, id, tags])</p></td>
+<td><p>Seismic data container</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mtuq.GreensTensor.html#mtuq.GreensTensor" title="mtuq.GreensTensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.GreensTensor</span></code></a>([traces, station, origin, …])</p></td>
+<td><p>Holds multiple time series corresponding to the independent elements  of an elastic Green’s tensor</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mtuq.GreensTensorList.html#mtuq.GreensTensorList" title="mtuq.GreensTensorList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.GreensTensorList</span></code></a>([tensors, id, tags])</p></td>
+<td><p>Container for one or more <cite>GreensTensor</cite> objects</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mtuq.Origin.html#mtuq.Origin" title="mtuq.Origin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.Origin</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Origin metadata object</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mtuq.Station.html#mtuq.Station" title="mtuq.Station"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.Station</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Station metadata object</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mtuq.graphics.plot_beachball.html#mtuq.graphics.plot_beachball" title="mtuq.graphics.plot_beachball"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.graphics.plot_beachball</span></code></a>(filename, mt)</p></td>
+<td><p>Plots focal mechanism of given moment tensor as PNG image</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mtuq.graphics.plot_data_synthetics.html#mtuq.graphics.plot_data_synthetics" title="mtuq.graphics.plot_data_synthetics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.graphics.plot_data_synthetics</span></code></a>(filename, …)</p></td>
+<td><p>Creates CAP-style data/synthetics figure</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mtuq.graphics.plot_likelihood_lune.html#mtuq.graphics.plot_likelihood_lune" title="mtuq.graphics.plot_likelihood_lune"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.graphics.plot_likelihood_lune</span></code></a>(filename, ds)</p></td>
+<td><p>Plots maximum likelihoods on eigenvalue lune (requires GMT)</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mtuq.graphics.plot_marginal_lune.html#mtuq.graphics.plot_marginal_lune" title="mtuq.graphics.plot_marginal_lune"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.graphics.plot_marginal_lune</span></code></a>(filename, ds)</p></td>
+<td><p>Plots marginal likelihoods on eigenvalue lune (requires GMT)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mtuq.graphics.plot_misfit_lune.html#mtuq.graphics.plot_misfit_lune" title="mtuq.graphics.plot_misfit_lune"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.graphics.plot_misfit_lune</span></code></a>(filename, ds)</p></td>
+<td><p>Plots misfit values on eigenvalue lune (requires GMT)</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mtuq.graphics.plot_likelihood_vw.html#mtuq.graphics.plot_likelihood_vw" title="mtuq.graphics.plot_likelihood_vw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.graphics.plot_likelihood_vw</span></code></a>(filename, ds)</p></td>
+<td><p>Plots maximum likelihoods on <cite>v-w</cite> rectangle</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mtuq.graphics.plot_marginal_vw.html#mtuq.graphics.plot_marginal_vw" title="mtuq.graphics.plot_marginal_vw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.graphics.plot_marginal_vw</span></code></a>(filename, ds)</p></td>
+<td><p>Plots marginal likelihoods on <cite>v-w</cite> rectangle</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mtuq.graphics.plot_misfit_vw.html#mtuq.graphics.plot_misfit_vw" title="mtuq.graphics.plot_misfit_vw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.graphics.plot_misfit_vw</span></code></a>(filename, ds[, …])</p></td>
+<td><p>Plots misfit values on <cite>v-w</cite> rectangle</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mtuq.graphics.plot_likelihood_force.html#mtuq.graphics.plot_likelihood_force" title="mtuq.graphics.plot_likelihood_force"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.graphics.plot_likelihood_force</span></code></a>(filename, ds)</p></td>
+<td><p>Plots maximum likelihoods on <cite>v-w</cite> rectangle</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mtuq.graphics.plot_marginal_force.html#mtuq.graphics.plot_marginal_force" title="mtuq.graphics.plot_marginal_force"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.graphics.plot_marginal_force</span></code></a>(filename, ds)</p></td>
+<td><p>Plots marginal likelihoods on <cite>v-w</cite> rectangle</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mtuq.graphics.plot_misfit_force.html#mtuq.graphics.plot_misfit_force" title="mtuq.graphics.plot_misfit_force"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.graphics.plot_misfit_force</span></code></a>(filename, ds)</p></td>
+<td><p>Plots misfit values on <cite>v-w</cite> rectangle</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mtuq.grid.DoubleCoupleGridRandom.html#mtuq.grid.DoubleCoupleGridRandom" title="mtuq.grid.DoubleCoupleGridRandom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.grid.DoubleCoupleGridRandom</span></code></a>([…])</p></td>
+<td><p>Double-couple moment tensor grid with randomly-spaced values</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mtuq.grid.DoubleCoupleGridRegular.html#mtuq.grid.DoubleCoupleGridRegular" title="mtuq.grid.DoubleCoupleGridRegular"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.grid.DoubleCoupleGridRegular</span></code></a>([…])</p></td>
+<td><p>Double-couple moment tensor grid with regularly-spaced values</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mtuq.grid.FullMomentTensorGridRandom.html#mtuq.grid.FullMomentTensorGridRandom" title="mtuq.grid.FullMomentTensorGridRandom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.grid.FullMomentTensorGridRandom</span></code></a>([…])</p></td>
+<td><p>Full moment tensor grid with randomly-spaced values</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mtuq.grid.FullMomentTensorGridSemiregular.html#mtuq.grid.FullMomentTensorGridSemiregular" title="mtuq.grid.FullMomentTensorGridSemiregular"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.grid.FullMomentTensorGridSemiregular</span></code></a>([…])</p></td>
+<td><p>Full moment tensor grid with semiregular values</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mtuq.grid.ForceGridRandom.html#mtuq.grid.ForceGridRandom" title="mtuq.grid.ForceGridRandom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.grid.ForceGridRandom</span></code></a>([magnitudes_in_N, …])</p></td>
+<td><p>Force grid with randomly-spaced values</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mtuq.grid.ForceGridRegular.html#mtuq.grid.ForceGridRegular" title="mtuq.grid.ForceGridRegular"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.grid.ForceGridRegular</span></code></a>([…])</p></td>
+<td><p>Force grid with regularly-spaced values</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mtuq.grid.Grid.html#mtuq.grid.Grid" title="mtuq.grid.Grid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.grid.Grid</span></code></a>([dims, coords, start, stop, …])</p></td>
+<td><p>A regularly-spaced grid defined by values along axes</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mtuq.grid.UnstructuredGrid.html#mtuq.grid.UnstructuredGrid" title="mtuq.grid.UnstructuredGrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.grid.UnstructuredGrid</span></code></a>([dims, coords, …])</p></td>
+<td><p>An unstructured grid is defined by lists of individual coordinate points,  which can be irregularly spaced</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mtuq.grid_search.grid_search.html#mtuq.grid_search.grid_search" title="mtuq.grid_search.grid_search"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.grid_search.grid_search</span></code></a>(data, greens, …)</p></td>
+<td><p>Evaluates misfit over grids</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mtuq.grid_search.MTUQDataArray.html#mtuq.grid_search.MTUQDataArray" title="mtuq.grid_search.MTUQDataArray"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.grid_search.MTUQDataArray</span></code></a>(data, coords, …)</p></td>
+<td><p>Data structure for storing values on regularly-spaced grids</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mtuq.grid_search.MTUQDataFrame.html#mtuq.grid_search.MTUQDataFrame" title="mtuq.grid_search.MTUQDataFrame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.grid_search.MTUQDataFrame</span></code></a>([data])</p></td>
+<td><p>Data structure for storing values on irregularly-spaced grids</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mtuq.Force.html#mtuq.Force" title="mtuq.Force"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.Force</span></code></a>(array[, convention])</p></td>
+<td><p>Force source</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mtuq.MomentTensor.html#mtuq.MomentTensor" title="mtuq.MomentTensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.MomentTensor</span></code></a>(array[, convention])</p></td>
+<td><p>Moment tensor object</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mtuq.Wavelet.html#mtuq.Wavelet" title="mtuq.Wavelet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.Wavelet</span></code></a>()</p></td>
+<td><p>Source wavelet/source-time function base class</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mtuq.ProcessData.html#mtuq.ProcessData" title="mtuq.ProcessData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.ProcessData</span></code></a>([filter_type, window_type, …])</p></td>
+<td><p>An attempt at a one-size-fits-all data processing class</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mtuq.Misfit.html#mtuq.Misfit" title="mtuq.Misfit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.Misfit</span></code></a>([norm, time_shift_groups, …])</p></td>
+<td><p>Data misfit function</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mtuq.download_greens_tensors.html#mtuq.download_greens_tensors" title="mtuq.download_greens_tensors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.download_greens_tensors</span></code></a>([stations, …])</p></td>
+<td><p>Downloads Green’s tensors from syngine</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mtuq.open_db.html#mtuq.open_db" title="mtuq.open_db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.open_db</span></code></a>([path_or_url, format])</p></td>
+<td><p>Opens database containing Green’s functions</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mtuq.read.html#mtuq.read" title="mtuq.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.read</span></code></a>([path, format])</p></td>
+<td><p>Reads waveform files from disk</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mtuq.io.clients.AxiSEM_NetCDF.Client.html#mtuq.io.clients.AxiSEM_NetCDF.Client" title="mtuq.io.clients.AxiSEM_NetCDF.Client"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.io.clients.AxiSEM_NetCDF.Client</span></code></a>([…])</p></td>
+<td><p>AxiSEM NetCDF database client (based on <a class="reference external" href="https://instaseis.net/">instaseis</a>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mtuq.io.clients.FK_SAC.Client.html#mtuq.io.clients.FK_SAC.Client" title="mtuq.io.clients.FK_SAC.Client"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.io.clients.FK_SAC.Client</span></code></a>([path_or_url, …])</p></td>
+<td><p>FK database client</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mtuq.io.clients.syngine.Client.html#mtuq.io.clients.syngine.Client" title="mtuq.io.clients.syngine.Client"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.io.clients.syngine.Client</span></code></a>([…])</p></td>
+<td><p>Syngine web service client</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mtuq.io.readers.SAC.read.html#mtuq.io.readers.SAC.read" title="mtuq.io.readers.SAC.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.io.readers.SAC.read</span></code></a>(filenames[, …])</p></td>
+<td><p>Reads SAC files and returns an <cite>mtuq.Dataset</cite></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mtuq.misfit.level0.html#module-mtuq.misfit.level0" title="mtuq.misfit.level0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.misfit.level0</span></code></a></p></td>
+<td><p>Data misfit module (non-optimized pure Python version)</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mtuq.misfit.level1.html#module-mtuq.misfit.level1" title="mtuq.misfit.level1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.misfit.level1</span></code></a></p></td>
+<td><p>Data misfit module (fast pure Python version)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mtuq.misfit.level2.html#module-mtuq.misfit.level2" title="mtuq.misfit.level2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtuq.misfit.level2</span></code></a></p></td>
+<td><p>Data misfit module (fast Python/C version)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

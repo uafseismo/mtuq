@@ -1,0 +1,6 @@
+mtuq.misfit.level2._get_greens
+==============================
+
+.. currentmodule:: mtuq.misfit.level2
+
+.. autofunction:: _get_greens

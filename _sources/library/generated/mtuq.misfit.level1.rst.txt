@@ -1,0 +1,48 @@
+﻿mtuq.misfit.level1
+==================
+
+.. currentmodule:: mtuq.misfit.level1
+.. automodule:: mtuq.misfit.level1
+
+   .. comment to end block
+
+   
+
+   
+   
+   
+   
+   
+   
+
+   
+   .. rubric:: Public Functions
+
+   .. autosummary::
+      :toctree: .
+      :nosignatures:
+
+   
+      misfit
+   
+
+   
+
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree: .
+      :nosignatures:
+
+   
+      Helper
+   
+   
+
+   
+   
+   

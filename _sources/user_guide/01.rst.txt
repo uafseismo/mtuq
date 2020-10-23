@@ -1,0 +1,62 @@
+Learning ObsPy and MTUQ
+=======================
+
+To avoid reinventing the wheel, MTUQ makes extensive use of `ObsPy <https://github.com/obspy/obspy/wiki>`_, a widely-used Python package for seismology.  If you're not familiar with Python or ObsPy, an excellent place to start is the `ObsPy tutorial <http://docs.obspy.org/tutorial/index.html>`_.
+
+
+
+MTUQ code snippets
+------------------
+
+.. warning::
+
+   Under construction
+
+
+#
+
+Reading a single trace:
+
+.. code ::
+
+   git clone --branch data <repo>
+
+   import obspy
+   stream = obspy.read(<filename>, format='SAC')
+
+
+#
+
+Reading a set of traces:
+
+.. code ::
+
+   git clone --branch data <repo>
+
+   import mtuq
+   data = mtuq.read(<wildcard>, format='SAC')
+
+#
+
+Processing a single trace
+
+.. code ::
+
+   from mtuq import ProcessData
+
+   function = ProcessData(filter='lowpass', period=5.)
+   processed_stream = function(stream)
+
+
+#
+
+Processing a set of traces:
+
+.. code ::
+
+   from mtuq import ProcessData
+
+   function = ProcessData(filter='lowpass', period=5.)
+   processed_data = data.map(function)
+
+

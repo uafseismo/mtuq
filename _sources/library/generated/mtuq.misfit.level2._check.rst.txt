@@ -1,0 +1,6 @@
+mtuq.misfit.level2._check
+=========================
+
+.. currentmodule:: mtuq.misfit.level2
+
+.. autofunction:: _check

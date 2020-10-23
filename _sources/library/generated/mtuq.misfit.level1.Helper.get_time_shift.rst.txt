@@ -1,0 +1,6 @@
+mtuq.misfit.level1.Helper.get_time_shift
+========================================
+
+.. currentmodule:: mtuq.misfit.level1
+
+.. automethod:: Helper.get_time_shift

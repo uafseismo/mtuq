@@ -1,0 +1,65 @@
+
+
+Data processing 
+===============
+
+Filtering, windowing and other signal processing operations are essential for meaningful comparisons between data synthetics.  
+
+To make data processing easier, `mtuq.ProcessData` is an attempt at a one-size-fits-all data processing class.  While the approach below based on `mtuq.ProcessData` is fairly general,  users are neverthelsss free to apply their own custom data processing functions instead, with the only requirement being that the `time discretization <https://uafgeotools.github.io/mtuq/user_guide/04.html#time-discretization-requirements>`_ conditions below end up being satisfied.
+
+
+
+An approach based on `mtuq.ProcessData`
+---------------------------------------
+
+Data processing choices include filter type, window length, and many others. For detailed descriptions of all available parameters, see the `API reference <https://uafgeotools.github.io/mtuq/library/generated/mtuq.ProcessData.html>`_.
+ 
+
+
+With `mtuq.ProcessData`, the choice of data processing parameters is clearly separated from the actual application of the data processing function to the seismic data, resulting in a two-step procedure.
+
+In the first step, the user supplies parameters to create a data processing function:
+
+.. code::
+
+    process_data = ProcessData(**parameters)
+
+In the second step, an ObsPy stream is given as input and a processed stream returned as output:
+
+.. code::
+
+    processed_stream = process_data(stream)
+
+
+Data processing can also be applied to an entire `Dataset` at once:
+
+.. code::
+
+    processed_data = mtuq.Dataset()
+    for stream in dataset:
+        processed_stream = process_data(stream)
+        processed_data += processed_stream
+
+
+Or, more succinctly:
+
+.. code::
+
+    processed_dataset = dataset.map(process_data)
+
+
+
+Time discretization requirements
+--------------------------------
+
+To make meaningful comparisons betweeen data and synthetics, windows must of course be chosen to include body wave and/or surface wave phases of interest.
+
+Two additional conditions turn out to be useful for numerical efficiency and software engineering robustness:
+
+1. all traces must have the same sampling rate and number of samples
+2. all traces common to the same station must have the same startime and endtime
+
+By imposing these time discretization requirements, MTUQ achieves faster memory access patterns, more efficent misfit evaluation, and more easily maintainable code.
+
+An easy way to ensure that the above requirements are satisfied is to simply use `mtuq.ProcessData` for data processing.
+

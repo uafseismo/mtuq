@@ -1,0 +1,94 @@
+
+
+Uncertainty visualization
+=========================
+
+MTUQ provides utilities for visualizing full moment tensor, double couple, force, hypocenter, and depth uncertainties.
+
+Brief descriptions of all these plotting functions can accessed through the library reference links below.
+
+
+Passing misfit values 
+---------------------
+
+Importantly, one input argument common to all visualization utilities is a data structure `ds`, which is expected to contain source parameters and corresponding L1 or L2 misfit values. 
+
+`ds` can be either of the following data types:
+
+- an `MTUQDataFrame` (for irregularly-spaced grids)
+
+- an `MTUQDataArray` (for regularly-spaced grids)
+
+As it happens, `mtuq.grid_search` returns these data structures automatically, with no additional user effort required.
+
+
+It happens that `ds` can also be either of the two parent classes, since subclass methods are not actually necessary for visualization:
+
+- a pandas `DataFrame` (for irregularly-spaced grids)
+
+- an xarray `DataArray` (for regularly-spaced grids)
+
+
+
+Data structure requirements
+---------------------------
+
+Before doing anything else, plotting utilities check that the given data structure `ds` contains the expected parameters.
+
+What is expected varies depending on the utility.  For example, full moment tensor utilities expect the following paraemters: `rho`, `v`, `w`, `kappa`, `sigma`, `h`.
+
+To see which parameters are expected in a particular case, look for functions named `_check`  within `mtuq/graphics/uq/`.
+
+
+
+Converting misfit values to likelihoods
+---------------------------------------
+
+All plotting utilities expect L1 or L2 misfit values, which must be passed through the input argument `ds`.  
+
+Some utilities then take these misfit values and convert on-the-fly to maximum or marginal likelihoods.
+
+*Current limitations*
+
+- only Guassian likelihood functions are implemented, which means that only L2 misfit values are accepted
+
+- a diagonal covariance matrix, specified by the input argument `sigma`, is used to convert misfit to likelihood; off-diagonal covarience matrices are not yet implemented
+
+
+
+Output image formats
+--------------------
+
+In all plotting utilities, the output image format is determined from the extension of the given filename.  If the extension is missing or unrecognized, the format defaults to PNG.
+
+
+
+Library reference links
+-----------------------
+
+For plotting L1 or L2 misfit values:
+- plot_misfit_lune
+- plot_misfit_vw
+- plot_misfit_dc
+- plot_misfit_force
+- plot_misfit_xy
+- plot_misfit_depth
+
+
+Converts L2 misfit values to likelihoods, then plots maximum likelihoods:
+- plot_likelihood_lune
+- plot_likelihood_vw
+- plot_likelihood_dc
+- plot_likelihood_force
+- plot_likelihood_xy
+- plot_likelihood_depth
+
+
+Converts L2 misfit values to likelihoods, then plots marginal likelihoods:
+- plot_marginal_lune
+- plot_marginal_vw
+- plot_marginal_dc
+- plot_marginal_force
+- plot_marginal_xy
+- plot_marginal_depth
+
