@@ -20,8 +20,8 @@ def gmt_plot_misfit_lune(filename, lon, lat, values, colormap='panoply', **kwarg
     values, minval, maxval, exp = _parse_values(values)
 
     _call(fullpath('mtuq/graphics/uq/_gmt/plot_lune'),
-        filename, 
-        lon, lat, values, 
+        filename,
+        lon, lat, values,
         z_min=minval,
         z_max=maxval,
         z_exp=exp,
@@ -29,6 +29,24 @@ def gmt_plot_misfit_lune(filename, lon, lat, values, colormap='panoply', **kwarg
         cpt_step=(maxval-minval)/20.,
         **kwargs)
 
+
+def gmt_plot_misfit_mt_lune(filename, lon, lat, values, colormap='panoply', **kwargs):
+
+    if _nothing_to_plot(values):
+        return
+
+    lon, lat =  _parse_lonlat(lon,lat)
+    values, minval, maxval, exp = _parse_values(values)
+
+    _call(fullpath('mtuq/graphics/uq/_gmt/plot_lune_mt'),
+        filename,
+        lon, lat, values,
+        z_min=minval,
+        z_max=maxval,
+        z_exp=exp,
+        cpt_name=colormap,
+        cpt_step=(maxval-minval)/20.,
+        **kwargs)
 
 def gmt_plot_likelihood_lune(filename, lon, lat, values, colormap='hot', **kwargs):
 
@@ -39,7 +57,7 @@ def gmt_plot_likelihood_lune(filename, lon, lat, values, colormap='hot', **kwarg
     values, minval, maxval, exp = _parse_values(values)
 
     _call(fullpath('mtuq/graphics/uq/_gmt/plot_lune'),
-        filename, 
+        filename,
         lon, lat, values,
         z_min=minval,
         z_max=maxval,
@@ -94,9 +112,9 @@ def gmt_plot_likelihood_force(filename, phi, h, values, colormap='hot', **kwargs
 
 
 def _call(shell_script, filename, lon, lat, values,
-    z_min=None, z_max=None, z_exp=0, 
+    z_min=None, z_max=None, z_exp=0,
     cpt_name='panoply', cpt_step=None, cpt_reverse=False,
-    colorbar_type=0, marker_type=0, title=''):
+    colorbar_type=0, marker_type=0, title='', global_min_lon=None, global_min_lat=None):
 
     print('  calling GMT script: %s' % basename(shell_script))
 
@@ -114,7 +132,7 @@ def _call(shell_script, filename, lon, lat, values,
 
     # call bash script
     if exists_gmt():
-        subprocess.call("%s %s %s %s %e %e %d %e %s %d %d %d %s %s" %
+        subprocess.call("%s %s %s %s %e %e %d %e %s %d %d %d %s %s %s %s" %
            (shell_script,
             ascii_data,
             filename,
@@ -128,7 +146,9 @@ def _call(shell_script, filename, lon, lat, values,
             int(colorbar_type),
             int(marker_type),
             title,
-            subtitle
+            subtitle,
+            global_min_lon,
+            global_min_lat
             ),
             shell=True)
     else:
@@ -212,16 +232,16 @@ def _parse_filetype(filename):
 
     parts = splitext(filename)
     name, ext = parts[0], parts[1].lstrip('.')
-        
+
     if ext.upper() in ['PS']:
         return 'EPS'
-        
+
     elif ext.upper() in ['JPG', 'JPEG']:
         return 'JPEG'
 
     elif ext.upper() in ['TIF', 'TIFF']:
         return 'TIFF'
-   
+
     elif ext.upper() in gmt_formats:
         return ext.upper()
 

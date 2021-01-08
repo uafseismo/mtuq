@@ -18,7 +18,7 @@ def isclose(X, Y):
 def correlate(v1, v2):
     """ Fast cross-correlation function
 
-    Correlates unpadded array v1 and padded array v2, producing result of 
+    Correlates unpadded array v1 and padded array v2, producing result of
     shape ``len(v2) - len(v1)``
     """
     n1, n2 = len(v1), len(v2)
@@ -61,9 +61,9 @@ def open_interval(x1, x2, N):
     """ Covers the open interval (x1, x2) with N regularly-spaced points
     """
 
-    # NOTE: np.linspace(x1, x2, N)[1:-1] would be slightly simpler 
+    # NOTE: np.linspace(x1, x2, N)[1:-1] would be slightly simpler
     # but not as readily used by matplotlib.pyplot.pcolor
- 
+
     return np.linspace(x1, x2, 2*N+1)[1:-1:2]
 
 
@@ -74,7 +74,7 @@ def closed_interval(x1, x2, N):
 
 
 def tight_interval(x1,x2,N,tightness=0.999):
-    # tightness (float) 
+    # tightness (float)
     # 0. reduces to ``open_intervel``, 1. reduces to ``closed_intervel``
     Lo = open_interval(x1,x2,N)
     Lc = closed_interval(x1,x2,N)
@@ -95,7 +95,7 @@ def lune_det(delta, gamma):
 
 
 def to_mij(rho, v, w, kappa, sigma, h):
-    """ Converts from lune parameters to moment tensor parameters 
+    """ Converts from lune parameters to moment tensor parameters
     (up-south-east convention)
     """
     kR3 = np.sqrt(3.)
@@ -141,8 +141,8 @@ def to_mij(rho, v, w, kappa, sigma, h):
         ((1. + 3.*C2k)*(1. - 3.*C2s) + 12.*C2t*Cs*Cs*Sk*Sk - 12.*Ct*S2k*S2s)))
 
     mt2 = m0* (1./6.) * \
-        (k2R6*Cb + Sb*(kR3*Ct*Ct*Ck*Ck*(1. + 3.*C2s)*Sg - k2R3*Ck*Ck*Sg*St*St + 
-        kR3*(1. - 3.*C2s)*Sg*Sk*Sk + 6.*Cg*Cs*St*S2k + 
+        (k2R6*Cb + Sb*(kR3*Ct*Ct*Ck*Ck*(1. + 3.*C2s)*Sg - k2R3*Ck*Ck*Sg*St*St +
+        kR3*(1. - 3.*C2s)*Sg*Sk*Sk + 6.*Cg*Cs*St*S2k +
         3.*Ct*(-4.*Cg*Ck*Ck*St*Ss + kR3*Sg*S2k*S2s)))
 
     mt3 = m0* (-1./2.)*Sb*(k2R3*Cs*Sg*St*(Ct*Cs*Sk - Ck*Ss) +
@@ -252,6 +252,11 @@ def to_rho(Mw):
     """
     return to_M0(Mw)*np.sqrt(2.)
 
+def to_Mw(rho):
+    """ Converts from Tape2012 magnitude parameter to moment magnitude
+    """
+    return ((np.log10(rho/np.sqrt(2))-9.1)/1.5)
+
 
 def semiregular_grid(npts_v, npts_w, tightness=0.5):
     """ Semiregular moment tensor grid
@@ -277,5 +282,3 @@ def semiregular_grid(npts_v, npts_w, tightness=0.5):
     gamma = gamma1*(1.-tightness) + gamma2*tightness
 
     return to_v(gamma), to_w(delta)
-
-

@@ -2,25 +2,14 @@
 
 
 # USAGE
-#   plot_force in out filetype z_min z_max z_exp cpt_step cpt_name cpt_reverse colorbar_type marker_type [title] [subtitle]
+#   plot_lune in out filetype zmin zmax z_inc colorbar_exp colorbar_type marker_type [title] [subtitle]
 #
-#   Plots lon,lat,msifit values from ASCII file on eigenvalue lune
-#
-# ARGUMENTS
-#    IN - name of ASCII file containing lon,lat,misfit values
-#    OUT - name of output image
-#    FILETYPE - format of output image (BMP,EPS,PDF,JPG,PNG,PPM,SVG,TIFF)
-#    ZMIN - colorbar minimum
-#    ZMAX - colorbar maximum
-#    DZ - colorbar increment
-#    COLORBAR_EXP - color scaling factor 10**exp
-#    COLORBAR_TYPE - 0: no colobar 1: horizontal colorbar
-#    MARKER_TYPE - 0: no marker, 1: marker
-#    TITLE - optional title string
-#    SUBTITLE - optional subtitle string
-#
+#   Plots lon,lat,likelihood values from ASCII file on eigenvalue lune
+
+
 # EXAMPLE
-#    plot_force misfit.xyz misfit.png PNG 0. 1. 0.01 0 1 1 "Misfit" "Z component"
+#    plot_lune likelihood.xyz likelihood.png PNG 0. 1. 0.01 0 1 1 "Likelihood" "Z component"
+
 
 
 
@@ -31,7 +20,7 @@ source _gmt_functions
 
 # parse input arguments
 if [ $# -lt 13 ] ; then
-    echo "plot_force: bad input arguments"
+    echo "plot_lune: bad input arguments"
     exit -1
 fi
 
@@ -48,12 +37,10 @@ colorbar_type=${10}
 marker_type=${11}
 title="${12}"
 subtitle="${13}"
-global_min_lon=${14}
-global_min_lat=${15}
 colorbar_label=""
 
-proj_arg="-JH0/6i"
-area_arg="-R-180/180/-90/90"
+proj_arg="-JH0/3.4i"
+area_arg="-R-30/30/-90/90"
 
 ps="${out}.ps"
 
@@ -76,8 +63,9 @@ gmt makecpt $cpt_args -D $range_arg > tmp_$out.cpt
 gmt pscontour $in $proj_arg $area_arg -Ctmp_$out.cpt -I -N -A- -O -K >> $ps
 
 
+
 # display reference arcs
-add_WSE_arcs_labels $ps $proj_arg $area_arg
+add_lune_arcs $ps $proj_arg $area_arg
 
 
 # display title
@@ -88,17 +76,14 @@ add_title $ps $proj_arg $area_arg "$title" "$subtitle"
 if [ $colorbar_type -ne 0 ]; then
     arg1=$( get_colorbar_arg1 "$colorbar_label" )
     arg2=$( get_colorbar_arg2 $z_exp )
-fi
-if [ $colorbar_type -eq 1 ]; then
-    gmt psscale -Ctmp_$out.cpt -D2.25/-0.333+w1.5/0.175+h "$arg1" "$arg2" -O -K >> $ps
+    gmt psscale -Ctmp_$out.cpt -D1.0/-0.4+w1.4/0.2+h "$arg1" "$arg2" -O -K >> $ps
 fi
 
 
 # display marker
-if [ $marker_type -ne 0 -a $marker_type -ne 3 ]; then
+if [ $marker_type -ne 0 ]; then
+    add_moment_tensor "$in" "$ps" $proj_arg $area_arg $cpt_name
     add_marker $marker_type "$in" "$ps" $proj_arg $area_arg
-elif [ $marker_type -eq 3 ]; then
-        add_marker $marker_type "$in" "$ps" $proj_arg $area_arg $global_min_lon $global_min_lat
 fi
 
 
@@ -110,4 +95,5 @@ custom_psconvert $ps $out $filetype
 
 
 rm tmp*$out*
+rm tmp*.txt
 rm $ps

@@ -34,15 +34,31 @@ function add_marker {
     ps="$3"
     proj_arg=$4
     area_arg=$5
+    global_min_lon=$6
+    global_min_lat=$7
 
     if [ $marker_type -eq 1 ]; then
         coords="$(idxmin $in)"
     elif [ $marker_type -eq 2 ]; then
         coords="$(idxmax $in)"
+    elif [ $marker_type -eq 3 ]; then
+        coords=$global_min_lon' '$global_min_lat
     fi
 
     echo $coords |\
-    gmt psxy -N -Sc23p -W2.0p,0/255/0 $proj_arg $area_arg -O -K >> $ps
+    gmt psxy -N -Sc23p -W2.0p,255/0/0 $proj_arg $area_arg -O -K >> $ps
+
+}
+
+
+function add_moment_tensor {
+    in="$1"
+    ps="$2"
+    proj_arg=$3
+    area_arg=$4
+    cpt_name=$5
+
+    gmt psmeca tmp_FMT_coords.txt -N -Sm0.2 $proj_arg $area_arg -Z$cpt_name -O -K >> $ps
 
 }
 
@@ -332,9 +348,8 @@ EOF
 function idxmin {
     echo $(gmt gmtinfo $1 -El | awk '{print $1, $2}')
 }
-    
+
 
 function idxmax {
     echo $(gmt gmtinfo $1 -Eh | awk '{print $1, $2}')
 }
-
